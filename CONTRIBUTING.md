@@ -11,9 +11,9 @@
 1. Crear un único Issue para el trabajo y agregarlo al Project de la organización.
 2. Actualizar `main` y crear desde allí la rama indicada por el TP.
 3. Realizar commits pequeños y descriptivos, vinculándolos con el Issue cuando corresponda; por ejemplo, `docs: adaptar archivos iniciales (#1)`.
-4. Abrir el PR contra `main`, completar la plantilla, incluir `Closes #N` y solicitar revisión a `@<SmartyPantry>/reviewers`.
+4. Abrir el PR contra `main`, completar la plantilla, incluir `Closes #N` y solicitar revisión a `@SmartyPantry/reviewers`.
 5. No hacer push directo a `main`, `stg` ni `prod`.
 6. Tras integrar capacidades aprobadas, abrir un PR de `main` a `stg`; para una entrega o defensa, abrir otro de `stg` a `prod`.
 
 ## URL para crear un PR de funcionalidad
-`https://github.com/<organizacion>/<repositorio>/compare/main...feature/<numero-issue>-<descripcion-corta>?expand=1`
+`https://github.com/ds-2026-grupo-14/SmartPantry/compare/main...feature/<numero-issue>-<descripcion-corta>?expand=1`
