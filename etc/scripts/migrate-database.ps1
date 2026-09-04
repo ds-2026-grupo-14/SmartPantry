@@ -4,8 +4,8 @@ $jobs = @()
 
 $jobs += Start-Job -Name "DbMigrator" -ScriptBlock {
     $ErrorActionPreference = "Stop"
-    Set-Location (Join-Path $using:scriptRoot "../../SmartPantry")
-    dotnet run --migrate-database
+    Set-Location (Join-Path $using:scriptRoot "../../src/SmartPantry.DbMigrator")
+    dotnet run
 
     if ($LASTEXITCODE -ne 0) {
         throw "dotnet run (DbMigrator) exited with code $LASTEXITCODE"

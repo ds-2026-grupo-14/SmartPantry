@@ -7,8 +7,7 @@
             @if(!hasLoggedIn){
               <h3>Welcome</h3>
               <p class="lead text-muted mb-2">
-              Welcome to the application. This is a startup project based on the ABP framework. For
-              more information visit abp.io.
+              {{ '::LongWelcomeMessage' | abpLocalization }}
               </p>
               <a (click)="login()" class="btn btn-primary mb-4"><i class="fa-solid fa-right-to-bracket me-1"></i><span>{{ 'AbpAccount::Login' | abpLocalization }}</span></a>
             }

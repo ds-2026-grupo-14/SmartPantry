@@ -1,5 +1,5 @@
-import { AuthService, LocalizationPipe } from '@abp/ng.core';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { AuthService, LocalizationPipe } from '@abp/ng.core';
 
 @Component({
   selector: 'app-home',

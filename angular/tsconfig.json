@@ -8,10 +8,10 @@
     "esModuleInterop": true,
     "experimentalDecorators": true,
     "moduleResolution": "bundler",
-    "module": "ES2022",
     "importHelpers": true,
     "skipLibCheck": true,
     "target": "ES2022",
+    "module": "ES2022",
     "lib": ["ES2022", "dom", "esnext.disposable"],
     "paths": {},
     "useDefineForClassFields": false

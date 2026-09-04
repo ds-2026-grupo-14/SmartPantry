@@ -23,10 +23,12 @@ function Setup-SelectiveSymlinks {
         exit 1
     }
 
+
     if ($packagesToSymlink.Count -eq 0 -or $packageDirectories.Count -eq 0) {
         Write-Host "✅ You are all set. There are no packages to symlink." -ForegroundColor Green
         exit 1
     }
+
 
     Write-Host "📦 Packages to symlink:" -ForegroundColor Yellow
     foreach ($package in $packagesToSymlink) {

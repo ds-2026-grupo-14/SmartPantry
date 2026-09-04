@@ -1,6 +1,7 @@
 {
-  "id": "b562e5a8-92cf-4aff-a777-6c0fa6aa4006",
-  "template": "app-nolayers",
+  "id": "0ba586b4-b6e5-448b-9cfe-f93c3e79e75c",
+  "creationTime": "09/02/2026 21:35:58 +00:00",
+  "template": "app",
   "versions": {
     "AbpFramework": "10.6.0",
     "AbpStudio": "3.1.1",
@@ -13,9 +14,8 @@
   },
   "runProfiles": {
     "Default": {
-      "path": "etc/run-profiles/Default.abprun.json"
-    }
-  },
+      "path": "etc/abp-studio/run-profiles/Default.abprun.json"
+    }  },
   "options": {
     "httpRequests": {
       "ignoredUrls": [
@@ -24,28 +24,34 @@
     }
   },
   "creatingStudioConfiguration": {
-    "template": "app-nolayers",
+    "template": "app",
     "createdAbpStudioVersion": "3.1.1",
     "creationTool": "ABP Studio UI",
-    "multiTenancy": "true",
+    "tiered": "false",
     "runInstallLibs": "",
     "useLocalReferences": "false",
+    "multiTenancy": "true",
+    "includeTests": "true",
+    "kubernetesConfiguration": "false",
     "uiFramework": "angular",
+    "mobileFramework": "none",
+    "distributedEventBus": "none",
     "databaseProvider": "ef",
     "runDbMigrator": "",
-    "includeTests": "false",
     "databaseManagementSystem": "sqlserver",
+    "separateTenantSchema": "false",
     "createInitialMigration": "",
     "theme": "leptonx-lite",
     "themeStyle": "",
     "themeMenuPlacement": "",
-    "progressiveWebApp": "",
-    "runProgressiveWebAppSupport": "",
-    "publicWebsite": "",
+    "mobileFramework": "none",
+    "progressiveWebApp": "false",
+    "runProgressiveWebAppSupport": "false",
+    "publicWebsite": "false",
     "socialLogin": "false",
     "sampleCrudPage": "true",
     "selectedLanguages": ["English", "Arabic", "Chinese (Simplified)", "Chinese (Traditional)", "Czech", "English (UK)", "Finnish", "French", "German (Germany)", "Hindi ", "Hungarian", "Icelandic", "Italian", "Korean", "Portuguese (Brazil)", "Romanian (Romania)", "Russian", "Slovak", "Spanish", "Swedish", "Turkish", ],
     "defaultLanguage": "English",
-    "createCommand": "abp new SmartPantry -t app-nolayers --ui-framework angular --database-provider ef --database-management-system sqlserver --theme leptonx-lite --skip-migration  --skip-migrator  --without-cms-kit --sample-crud-page --dont-run-install-libs --dont-run-bundling --no-social-logins -no-gdpr -no-openiddict-admin-ui -no-audit-logging -no-file-management -no-language-management -no-text-template-management"
+    "createCommand": "abp new SmartPantry -t app --ui-framework angular --database-provider ef --database-management-system sqlserver --theme leptonx-lite --skip-migration  --skip-migrator  --without-cms-kit --sample-crud-page --dont-run-install-libs --dont-run-bundling --no-social-logins -no-gdpr -no-openiddict-admin-ui -no-audit-logging -no-file-management -no-language-management -no-text-template-management"
   }
 }

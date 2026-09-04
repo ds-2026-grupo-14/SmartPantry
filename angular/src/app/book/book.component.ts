@@ -13,8 +13,8 @@ import {
   Injector,
   signal,
 } from '@angular/core';
-import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { DatePipe, CurrencyPipe, formatDate } from '@angular/common';
+import { rxResource, toSignal } from '@angular/core/rxjs-interop';
 import { NgbDatepickerModule, NgbDateStruct, NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import {

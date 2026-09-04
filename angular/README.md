@@ -1,6 +1,6 @@
 # SmartPantry - Angular Application
 
-This is an Angular application built on the ABP Framework. For more information, visit [abp.io](https://abp.io/).
+This is an Angular application built on the ABP Framework. For more information, visit <a href="https://abp.io/" target="_blank">abp.io</a>.
 
 ## Pre-requirements
 
@@ -25,7 +25,9 @@ abp install-libs
 
 ### Start the backend
 
-Before running the Angular application, make sure your backend API is running. Start the `SmartPantry` application.
+Before running the Angular application, make sure your backend API is running:
+
+* Start the host application
 
 ## Development server
 
@@ -42,6 +44,14 @@ abp generate-proxy -t ng
 ```
 
 This command generates service proxies that allow you to call your backend APIs in a type-safe manner.
+
+### Add Module
+
+Add a new ABP module to your Angular application:
+
+```bash
+abp add-module <module-name>
+```
 
 ## Code scaffolding
 
@@ -74,6 +84,8 @@ The development environment configuration is located in `src/environments/enviro
 ### Production Environment
 
 For production, the application uses dynamic environment configuration through the `dynamic-env.json` file. This allows you to configure the environment variables at deployment time without rebuilding the application.
+
+The web server's `getEnvConfig` endpoint is configured by default to serve the environment configuration.
 
 See [Environment](https://abp.io/docs/latest/framework/ui/angular/environment) for more information.
 

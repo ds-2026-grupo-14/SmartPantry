@@ -1,0 +1,32 @@
+﻿{
+  "selectedKubernetesProfile": null,
+  "solutionRunner": {
+    "selectedProfile": "Default",
+    "targetFrameworks": [],
+    "applicationsStartingWithoutBuild": [],
+    "applicationsWithoutAutoRefreshBrowserOnRestart": [],
+    "applicationsWithoutRestartAfterCrash": [],
+    "applicationBatchStartStates": [
+      {
+        "profile": "Default",
+        "applicationOrFolder": "SmartPantry.Angular",
+        "value": 0
+      },
+      {
+        "profile": "Default",
+        "applicationOrFolder": "SmartPantry.HttpApi.Host",
+        "value": 0
+      }
+    ],
+    "folderBatchStartStates": [],
+    "selectedWorkflowIds": []
+  },
+  "lastSelectedAgentSessionId": null,
+  "disabledAiRules": [],
+  "disabledSkills": [],
+  "aiScopes": [],
+  "activeAiScopeId": null,
+  "openCodeFiles": [],
+  "recentCodeFiles": [],
+  "isWorkspaceRagEnabled": true
+}
