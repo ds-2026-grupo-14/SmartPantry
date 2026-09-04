@@ -421,6 +421,11 @@ FodyWeavers.xsd
 # Built Visual Studio Code Extensions
 *.vsix
 
+# Herramientas locales y extensiones del usuario (TP04)
+.abpstudio/
+.cursor/
+Directory.DotSettings
+
 # Windows Installer files from build outputs
 *.cab
 *.msi
