@@ -26,7 +26,8 @@
             },
             "index": "src/index.html",
             "polyfills": [
-              "src/polyfills.ts"
+              "zone.js",
+              "@angular/localize/init"
             ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
@@ -191,7 +192,6 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
-            "polyfills": [ "zone.js", "zone.js/testing" ],
             "tsConfig": "tsconfig.spec.json",
             "buildTarget": "SmartPantry:build",
             "runner": "vitest"
