@@ -38,7 +38,7 @@ Para poner en marcha la solución de forma local[cite: 2]:
 4. Iniciar el backend ejecutando el proyecto `SmartPantry.HttpApi.Host`[cite: 2].
 5. Iniciar la interfaz de Angular ingresando a la carpeta `angular` y ejecutando `yarn start`[cite: 2].
 
-##Cómo detener los procesos
+## Cómo detener los procesos
 Backend (HttpApi.Host): Si se inició con F5 en Visual Studio, presionar el botón rojo de detener ("Stop Debugging") o Shift+F5. Si se ejecutó desde la terminal con dotnet run, presionar Ctrl + C en esa consola.
 
 Frontend (Angular): Ir a la terminal donde se ejecutó yarn start, presionar Ctrl + C y confirmar la finalización.
