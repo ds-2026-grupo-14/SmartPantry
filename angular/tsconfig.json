@@ -10,9 +10,9 @@
     "moduleResolution": "bundler",
     "importHelpers": true,
     "skipLibCheck": true,
-    "target": "ES2022",
-    "module": "ES2022",
-    "lib": ["ES2022", "dom", "esnext.disposable"],
+    "target": "esnext",
+    "module": "esnext",
+    "lib": [ "ES2022", "dom", "esnext.disposable" ],
     "paths": {},
     "useDefineForClassFields": false
   },
