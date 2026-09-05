@@ -57,5 +57,5 @@ Para comprobar la correcta compilación y funcionamiento del proyecto mediante l
 * Angular Build y Test:
   ```bash
   yarn build
-  yarn test --watch=false --browsers ChromeHeadless
+  yarn test --watch=false 
   ```[cite: 2]
