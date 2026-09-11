@@ -1,9 +1,12 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Volo.Abp.Domain.Repositories;
 
 namespace SmartPantry.Products;
 
+// Habilitado temporalmente acceso anonimo para verificar la operacion en Swagger segun TP05
+[AllowAnonymous]
 public class ProductAppService : SmartPantryAppService, IProductAppService
 {
     private readonly IRepository<Product, Guid> _productRepository;
