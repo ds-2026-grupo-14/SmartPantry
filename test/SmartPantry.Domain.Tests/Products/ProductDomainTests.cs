@@ -12,7 +12,7 @@ public abstract class ProductDomainTests<TStartupModule> : SmartPantryDomainTest
     [Fact]
     public void Should_Create_Valid_Product_And_Normalize_Text_Data()
     {
-        // Arrange
+        
         var id = Guid.NewGuid();
         var rawBarcode = " 7791234567890 ";
         var rawName = " Leche Entera ";
@@ -62,7 +62,7 @@ public abstract class ProductDomainTests<TStartupModule> : SmartPantryDomainTest
     [InlineData("   ")]
     public void Should_Reject_Empty_Or_Whitespace_Name(string? invalidName)
     {
-        // Act & Assert
+        
         Should.Throw<ArgumentException>(() =>
         {
             new Product(

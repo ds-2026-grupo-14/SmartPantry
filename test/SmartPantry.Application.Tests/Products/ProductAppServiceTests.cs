@@ -36,10 +36,9 @@ public abstract class ProductAppServiceTests<TStartupModule> : SmartPantryApplic
             Quantity = "200g"
         };
 
-        // Act
         var createdDto = await _productAppService.CreateAsync(input);
 
-        // Assert - Comprobar que fue creado
+        //Comprobar que fue creado
         createdDto.ShouldNotBeNull();
         createdDto.Id.ShouldNotBe(Guid.Empty);
         createdDto.Barcode.ShouldBe("7798765432109");
@@ -78,9 +77,9 @@ public abstract class ProductAppServiceTests<TStartupModule> : SmartPantryApplic
     [Fact]
     public async Task Should_Execute_Full_Product_Lifecycle_Crud_Flow()
     {
-        // -------------------------------------------------------------
+        
         // 1. Crear (CreateAsync)
-        // -------------------------------------------------------------
+       
         var createInput = new CreateProductDto
         {
             Barcode = "7791234567899",
@@ -106,9 +105,9 @@ public abstract class ProductAppServiceTests<TStartupModule> : SmartPantryApplic
 
         var productId = createdProduct.Id;
 
-        // -------------------------------------------------------------
+        
         // 2. Listar paginado (GetListAsync)
-        // -------------------------------------------------------------
+        
         var listResult = await _productAppService.GetListAsync(new PagedAndSortedResultRequestDto
         {
             MaxResultCount = 10,
@@ -119,9 +118,9 @@ public abstract class ProductAppServiceTests<TStartupModule> : SmartPantryApplic
         listResult.TotalCount.ShouldBeGreaterThanOrEqualTo(1);
         listResult.Items.ShouldContain(p => p.Id == productId);
 
-        // -------------------------------------------------------------
+        
         // 3. Modificar (UpdateAsync)
-        // -------------------------------------------------------------
+        
         var updateInput = new UpdateProductDto
         {
             Name = "Arroz Integral Doble Carolina",
@@ -143,9 +142,9 @@ public abstract class ProductAppServiceTests<TStartupModule> : SmartPantryApplic
         updatedProduct.Ingredients.ShouldBe("Arroz parboil seleccionado");
         updatedProduct.Allergens.ShouldBe("Puede contener trazas de soja");
 
-        // -------------------------------------------------------------
+        
         // 4. Consultar (GetAsync)
-        // -------------------------------------------------------------
+        
         var retrievedProduct = await _productAppService.GetAsync(productId);
 
         retrievedProduct.ShouldNotBeNull();
@@ -158,14 +157,14 @@ public abstract class ProductAppServiceTests<TStartupModule> : SmartPantryApplic
         retrievedProduct.Ingredients.ShouldBe("Arroz parboil seleccionado");
         retrievedProduct.Allergens.ShouldBe("Puede contener trazas de soja");
 
-        // -------------------------------------------------------------
+        
         // 5. Eliminar (DeleteAsync)
-        // -------------------------------------------------------------
+        
         await _productAppService.DeleteAsync(productId);
 
-        // -------------------------------------------------------------
+        
         // 6. Verificar que GetAsync sobre el eliminado falle lanzando EntityNotFoundException
-        // -------------------------------------------------------------
+        
         await Should.ThrowAsync<EntityNotFoundException>(async () =>
         {
             await _productAppService.GetAsync(productId);
