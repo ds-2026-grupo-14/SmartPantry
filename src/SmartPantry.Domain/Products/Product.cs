@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities;
 
@@ -37,6 +37,62 @@ public class Product : BasicAggregateRoot<Guid>
         SetQuantity(quantity);
         SetIngredients(ingredients);
         SetAllergens(allergens);
+    }
+
+    public void Update(
+        string name,
+        ItemCategory category,
+        string? brand = null,
+        string? quantity = null,
+        string? ingredients = null,
+        string? allergens = null)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("El nombre del producto no puede ser nulo o vacío.", nameof(name));
+        }
+
+        var normalizedName = name.Trim();
+        if (normalizedName.Length > ProductConsts.MaxNameLength)
+        {
+            throw new ArgumentException($"El nombre no puede superar los {ProductConsts.MaxNameLength} caracteres.", nameof(name));
+        }
+
+        if (category == ItemCategory.Undefined || !Enum.IsDefined(typeof(ItemCategory), category))
+        {
+            throw new ArgumentException("La categoría especificada no es válida.", nameof(category));
+        }
+
+        var normalizedBrand = brand?.Trim();
+        if (!string.IsNullOrEmpty(normalizedBrand) && normalizedBrand.Length > ProductConsts.MaxBrandLength)
+        {
+            throw new ArgumentException($"La marca no puede superar los {ProductConsts.MaxBrandLength} caracteres.", nameof(brand));
+        }
+
+        var normalizedQuantity = quantity?.Trim();
+        if (!string.IsNullOrEmpty(normalizedQuantity) && normalizedQuantity.Length > ProductConsts.MaxQuantityLength)
+        {
+            throw new ArgumentException($"La cantidad no puede superar los {ProductConsts.MaxQuantityLength} caracteres.", nameof(quantity));
+        }
+
+        var normalizedIngredients = ingredients?.Trim();
+        if (!string.IsNullOrEmpty(normalizedIngredients) && normalizedIngredients.Length > ProductConsts.MaxIngredientsLength)
+        {
+            throw new ArgumentException($"Los ingredientes no pueden superar los {ProductConsts.MaxIngredientsLength} caracteres.", nameof(ingredients));
+        }
+
+        var normalizedAllergens = allergens?.Trim();
+        if (!string.IsNullOrEmpty(normalizedAllergens) && normalizedAllergens.Length > ProductConsts.MaxAllergensLength)
+        {
+            throw new ArgumentException($"Los alérgenos no pueden superar los {ProductConsts.MaxAllergensLength} caracteres.", nameof(allergens));
+        }
+
+        Name = normalizedName;
+        Category = category;
+        Brand = string.IsNullOrEmpty(normalizedBrand) ? null : normalizedBrand;
+        Quantity = string.IsNullOrEmpty(normalizedQuantity) ? null : normalizedQuantity;
+        Ingredients = string.IsNullOrEmpty(normalizedIngredients) ? null : normalizedIngredients;
+        Allergens = string.IsNullOrEmpty(normalizedAllergens) ? null : normalizedAllergens;
     }
 
     // Métodos para proteger el estado válido y normalizar texto

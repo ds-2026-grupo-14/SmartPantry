@@ -1,22 +1,29 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Volo.Abp.Application.Dtos;
+using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 
 namespace SmartPantry.Products;
 
-// Habilitado temporalmente acceso anonimo para verificar la operacion en Swagger segun TP05
 [AllowAnonymous]
-public class ProductAppService : SmartPantryAppService, IProductAppService
+public class ProductAppService :
+    CrudAppService<
+        Product,
+        ProductDto,
+        Guid,
+        PagedAndSortedResultRequestDto,
+        CreateProductDto,
+        UpdateProductDto>,
+    IProductAppService
 {
-    private readonly IRepository<Product, Guid> _productRepository;
-
-    public ProductAppService(IRepository<Product, Guid> productRepository)
+    public ProductAppService(IRepository<Product, Guid> repository)
+        : base(repository)
     {
-        _productRepository = productRepository;
     }
 
-    public async Task<ProductDto> CreateAsync(CreateProductDto input)
+    public override async Task<ProductDto> CreateAsync(CreateProductDto input)
     {
         var product = new Product(
             GuidGenerator.Create(),
@@ -29,16 +36,28 @@ public class ProductAppService : SmartPantryAppService, IProductAppService
             input.Allergens
         );
 
-        await _productRepository.InsertAsync(product);
+        await Repository.InsertAsync(product, autoSave: true);
 
-        return ObjectMapper.Map<Product, ProductDto>(product);
+        return await MapToGetOutputDtoAsync(product);
     }
 
-    public async Task<ProductDto> GetAsync(Guid id)
+    // Sobreescribimos UpdateAsync para delegar la mutación a las reglas del dominio
+    public override async Task<ProductDto> UpdateAsync(Guid id, UpdateProductDto input)
     {
-        var product = await _productRepository.GetAsync(id);
+        var product = await Repository.GetAsync(id);
 
-        return ObjectMapper.Map<Product, ProductDto>(product);
+        product.Update(
+            input.Name,
+            input.Category,
+            input.Brand,
+            input.Quantity,
+            input.Ingredients,
+            input.Allergens
+        );
+
+        await Repository.UpdateAsync(product, autoSave: true);
+
+        return await MapToGetOutputDtoAsync(product);
     }
-}
 
+}

@@ -2,6 +2,8 @@ using System;
 using System.Threading.Tasks;
 using Shouldly;
 using SmartPantry.Products;
+using Volo.Abp.Application.Dtos;
+using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Modularity;
 using Volo.Abp.Validation;
@@ -34,10 +36,9 @@ public abstract class ProductAppServiceTests<TStartupModule> : SmartPantryApplic
             Quantity = "200g"
         };
 
-        // Act
         var createdDto = await _productAppService.CreateAsync(input);
 
-        // Assert - Comprobar que fue creado
+        //Comprobar que fue creado
         createdDto.ShouldNotBeNull();
         createdDto.Id.ShouldNotBe(Guid.Empty);
         createdDto.Barcode.ShouldBe("7798765432109");
@@ -71,6 +72,107 @@ public abstract class ProductAppServiceTests<TStartupModule> : SmartPantryApplic
         {
             await _productAppService.CreateAsync(invalidInput);
         });
+    }
+
+    [Fact]
+    public async Task Should_Execute_Full_Product_Lifecycle_Crud_Flow()
+    {
+        
+        // 1. Crear (CreateAsync)
+       
+        var createInput = new CreateProductDto
+        {
+            Barcode = "7791234567899",
+            Name = "Arroz Integral",
+            Category = ItemCategory.DryGoods,
+            Brand = "Gallo",
+            Quantity = "1kg",
+            Ingredients = "Arroz integral",
+            Allergens = "Ninguno"
+        };
+
+        var createdProduct = await _productAppService.CreateAsync(createInput);
+
+        createdProduct.ShouldNotBeNull();
+        createdProduct.Id.ShouldNotBe(Guid.Empty);
+        createdProduct.Barcode.ShouldBe("7791234567899");
+        createdProduct.Name.ShouldBe("Arroz Integral");
+        createdProduct.Category.ShouldBe(ItemCategory.DryGoods);
+        createdProduct.Brand.ShouldBe("Gallo");
+        createdProduct.Quantity.ShouldBe("1kg");
+        createdProduct.Ingredients.ShouldBe("Arroz integral");
+        createdProduct.Allergens.ShouldBe("Ninguno");
+
+        var productId = createdProduct.Id;
+
+        
+        // 2. Listar paginado (GetListAsync)
+        
+        var listResult = await _productAppService.GetListAsync(new PagedAndSortedResultRequestDto
+        {
+            MaxResultCount = 10,
+            SkipCount = 0
+        });
+
+        listResult.ShouldNotBeNull();
+        listResult.TotalCount.ShouldBeGreaterThanOrEqualTo(1);
+        listResult.Items.ShouldContain(p => p.Id == productId);
+
+        
+        // 3. Modificar (UpdateAsync)
+        
+        var updateInput = new UpdateProductDto
+        {
+            Name = "Arroz Integral Doble Carolina",
+            Category = ItemCategory.DryGoods,
+            Brand = "Gallo Oro",
+            Quantity = "500g",
+            Ingredients = "Arroz parboil seleccionado",
+            Allergens = "Puede contener trazas de soja"
+        };
+
+        var updatedProduct = await _productAppService.UpdateAsync(productId, updateInput);
+
+        updatedProduct.ShouldNotBeNull();
+        updatedProduct.Id.ShouldBe(productId);
+        updatedProduct.Name.ShouldBe("Arroz Integral Doble Carolina");
+        updatedProduct.Category.ShouldBe(ItemCategory.DryGoods);
+        updatedProduct.Brand.ShouldBe("Gallo Oro");
+        updatedProduct.Quantity.ShouldBe("500g");
+        updatedProduct.Ingredients.ShouldBe("Arroz parboil seleccionado");
+        updatedProduct.Allergens.ShouldBe("Puede contener trazas de soja");
+
+        
+        // 4. Consultar (GetAsync)
+        
+        var retrievedProduct = await _productAppService.GetAsync(productId);
+
+        retrievedProduct.ShouldNotBeNull();
+        retrievedProduct.Id.ShouldBe(productId);
+        retrievedProduct.Barcode.ShouldBe("7791234567899"); // El Barcode se mantiene inmutable
+        retrievedProduct.Name.ShouldBe("Arroz Integral Doble Carolina");
+        retrievedProduct.Category.ShouldBe(ItemCategory.DryGoods);
+        retrievedProduct.Brand.ShouldBe("Gallo Oro");
+        retrievedProduct.Quantity.ShouldBe("500g");
+        retrievedProduct.Ingredients.ShouldBe("Arroz parboil seleccionado");
+        retrievedProduct.Allergens.ShouldBe("Puede contener trazas de soja");
+
+        
+        // 5. Eliminar (DeleteAsync)
+        
+        await _productAppService.DeleteAsync(productId);
+
+        
+        // 6. Verificar que GetAsync sobre el eliminado falle lanzando EntityNotFoundException
+        
+        await Should.ThrowAsync<EntityNotFoundException>(async () =>
+        {
+            await _productAppService.GetAsync(productId);
+        });
+
+        // Verificación adicional a nivel de persistencia en el repositorio
+        var entityInDb = await _productRepository.FindAsync(productId);
+        entityInDb.ShouldBeNull();
     }
 }
 
