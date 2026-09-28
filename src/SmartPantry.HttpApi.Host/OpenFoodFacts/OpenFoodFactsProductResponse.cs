@@ -8,7 +8,7 @@ internal class OpenFoodFactsResponse
     public string? Code { get; set; }
 
     [JsonPropertyName("status")]
-    public int Status { get; set; }
+    public string? Status { get; set; }
 
     [JsonPropertyName("product")]
     public OpenFoodFactsProduct? Product { get; set; }
