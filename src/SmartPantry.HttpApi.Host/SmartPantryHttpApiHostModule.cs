@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using SmartPantry.OpenFoodFacts;
+using SmartPantry.ExternalProductCatalog;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Authentication;
@@ -127,6 +129,7 @@ public class SmartPantryHttpApiHostModule : AbpModule
         ConfigureSwagger(context, configuration);
         ConfigureVirtualFileSystem(context);
         ConfigureCors(context, configuration);
+        ConfigureOpenFoodFacts(context, configuration);
     }
 
     private void ConfigureStudio(IHostEnvironment hostingEnvironment)
@@ -301,5 +304,22 @@ public class SmartPantryHttpApiHostModule : AbpModule
         app.UseAuditing();
         app.UseAbpSerilogEnrichers();
         app.UseConfiguredEndpoints();
+    }
+
+    private void ConfigureOpenFoodFacts(ServiceConfigurationContext context, IConfiguration configuration)
+    {
+        context.Services.Configure<OpenFoodFactsOptions>(configuration.GetSection("OpenFoodFacts"));
+
+        context.Services.AddHttpClient<IExternalProductCatalogClient, OpenFoodFactsProductCatalogClient>((serviceProvider, client) =>
+        {
+            var options = configuration.GetSection("OpenFoodFacts").Get<OpenFoodFactsOptions>();
+            
+            if (options != null)
+            {
+                client.BaseAddress = new Uri(options.BaseUrl);
+                client.DefaultRequestHeaders.Add("User-Agent", options.UserAgent);
+                client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
+            }
+        });
     }
 }
