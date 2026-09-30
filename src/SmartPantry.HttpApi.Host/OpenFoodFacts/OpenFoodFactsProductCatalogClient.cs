@@ -17,39 +17,51 @@ public class OpenFoodFactsProductCatalogClient : IExternalProductCatalogClient
 
     public async Task<ExternalProductDto?> GetByBarcodeAsync(string barcode)
     {
-        var response = await _httpClient.GetAsync($"api/v3/product/{barcode}");
-
-        if (response.StatusCode == HttpStatusCode.NotFound)
+        try
         {
-            return null;
-        }
+            var url = $"api/v3/product/{barcode}?fields=code,product_name,brands,categories,quantity,ingredients_text,allergens";
+            var response = await _httpClient.GetAsync(url);
 
-        if (response.StatusCode == HttpStatusCode.TooManyRequests)
-        {
-            throw new RateLimitExceededException();
-        }
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return null;
+            }
 
-        if (response.StatusCode == HttpStatusCode.ServiceUnavailable || response.StatusCode == HttpStatusCode.InternalServerError)
+            if (response.StatusCode == HttpStatusCode.TooManyRequests)
+            {
+                throw new RateLimitExceededException();
+            }
+
+            if (response.StatusCode == HttpStatusCode.ServiceUnavailable || response.StatusCode == HttpStatusCode.InternalServerError)
+            {
+                throw new ServiceUnavailableException();
+            }
+
+            response.EnsureSuccessStatusCode();
+
+            var jsonResult = await response.Content.ReadFromJsonAsync<OpenFoodFactsResponse>();
+
+            if (jsonResult?.Product == null)
+                return null;
+
+            return new ExternalProductDto
+            {
+                Barcode = barcode,
+                Name = jsonResult.Product.ProductName,
+                Brand = jsonResult.Product.Brands,
+                Category = jsonResult.Product.Categories,
+                Quantity = jsonResult.Product.Quantity,
+                Ingredients = jsonResult.Product.IngredientsText,
+                Allergens = jsonResult.Product.Allergens
+            };
+        }
+        catch (HttpRequestException)
         {
             throw new ServiceUnavailableException();
         }
-
-        response.EnsureSuccessStatusCode();
-
-        var jsonResult = await response.Content.ReadFromJsonAsync<OpenFoodFactsResponse>();
-
-        if (jsonResult?.Product == null)
-            return null;
-
-        return new ExternalProductDto
+        catch (TaskCanceledException)
         {
-            Barcode = barcode,
-            Name = jsonResult.Product.ProductName,
-            Brand = jsonResult.Product.Brands,
-            Category = jsonResult.Product.Categories,
-            Quantity = jsonResult.Product.Quantity,
-            Ingredients = jsonResult.Product.IngredientsText,
-            Allergens = jsonResult.Product.Allergens
-        };
+            throw new ServiceUnavailableException();
+        }
     }
 }
