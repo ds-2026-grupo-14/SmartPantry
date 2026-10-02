@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using SmartPantry.Authors;
 using SmartPantry.Books;
+using SmartPantry.Pantry;
 using SmartPantry.Products;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.BlobStoring.Database.EntityFrameworkCore;
@@ -35,6 +36,10 @@ public class SmartPantryDbContext :
     public DbSet<Book> Books { get; set; }
 
     public DbSet<Product> Products { get; set; }
+
+    public DbSet<PantryItem> PantryItems { get; set; }
+
+    public DbSet<PantryItemWarning> PantryItemWarnings { get; set; }
 
     #region Entities from the modules
 
@@ -121,13 +126,29 @@ public class SmartPantryDbContext :
             b.HasIndex(x => x.Barcode).IsUnique();
         });
 
-        /* Configure your own tables/entities inside here */
+        builder.Entity<PantryItem>(b =>
+        {
+            b.ToTable(SmartPantryConsts.DbTablePrefix + "PantryItems", SmartPantryConsts.DbSchema);
+            b.ConfigureByConvention();
+            b.Property(x => x.UserId).IsRequired();
+            b.Property(x => x.ProductId).IsRequired();
+            b.Property(x => x.State).IsRequired();
+            b.Property(x => x.ExpirationDate);
 
-        //builder.Entity<YourEntity>(b =>
-        //{
-        //    b.ToTable(SmartPantryConsts.DbTablePrefix + "YourEntities", SmartPantryConsts.DbSchema);
-        //    b.ConfigureByConvention(); //auto configure for the base class props
-        //    //...
-        //});
+            b.HasOne<Product>().WithMany().HasForeignKey(x => x.ProductId).IsRequired();
+        });
+
+        builder.Entity<PantryItemWarning>(b =>
+        {
+            b.ToTable(SmartPantryConsts.DbTablePrefix + "PantryItemWarnings", SmartPantryConsts.DbSchema);
+            b.ConfigureByConvention();
+            b.Property(x => x.PantryItemId).IsRequired();
+            b.Property(x => x.WarningType).IsRequired().HasMaxLength(PantryWarningConsts.MaxWarningTypeLength);
+            b.Property(x => x.Message).IsRequired().HasMaxLength(PantryWarningConsts.MaxMessageLength);
+            b.Property(x => x.IsActive).IsRequired();
+
+            b.HasIndex(x => new { x.PantryItemId, x.WarningType }).IsUnique();
+            b.HasOne<PantryItem>().WithMany().HasForeignKey(x => x.PantryItemId).IsRequired();
+        });
     }
 }
