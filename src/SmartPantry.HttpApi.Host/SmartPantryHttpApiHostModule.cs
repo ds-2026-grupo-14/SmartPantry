@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using SmartPantry.OpenFoodFacts;
 using SmartPantry.ExternalProductCatalog;
+using SmartPantry.Workers;
+using Volo.Abp.BackgroundWorkers;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Authentication;
@@ -321,5 +324,11 @@ public class SmartPantryHttpApiHostModule : AbpModule
                 client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
             }
         });
+    }
+
+    public override async Task OnApplicationInitializationAsync(ApplicationInitializationContext context)
+    {
+        await base.OnApplicationInitializationAsync(context);
+        await context.AddBackgroundWorkerAsync<ExpirationWarningWorker>();
     }
 }
