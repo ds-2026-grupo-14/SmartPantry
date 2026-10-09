@@ -18,6 +18,7 @@ public class ExpirationWarningWorker : AsyncPeriodicBackgroundWorkerBase
     {
         // 12 hours in milliseconds
         timer.Period = 12 * 60 * 60 * 1000;
+        timer.RunOnStart = true;
     }
 
     protected override async Task DoWorkAsync(PeriodicBackgroundWorkerContext workerContext)
