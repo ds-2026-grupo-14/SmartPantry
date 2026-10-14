@@ -122,6 +122,29 @@ public class PantryExpirationManagerTests
     }
 
     [Fact]
+    public async Task Should_Create_Warning_When_Expiration_Is_Exactly_At_Threshold_Limit()
+    {
+        // Lácteo tiene un umbral de 2 días.
+        // Ítem que vence exactamente en la fecha límite del umbral (hoy + 2 días) -> debe generar advertencia.
+        var dairyProduct = CreateProduct(ItemCategory.Dairy);
+        var boundaryItem = CreatePantryItem(dairyProduct.Id, _referenceDate.AddDays(2));
+
+        // Ítem que vence un día más allá del umbral (hoy + 3 días) -> NO debe generar advertencia.
+        var beyondItem = CreatePantryItem(dairyProduct.Id, _referenceDate.AddDays(3));
+
+        var count = await _manager.ProcessExpirationsAsync(_referenceDate);
+
+        count.ShouldBe(1);
+        _warningsDb.Count.ShouldBe(1);
+        var warning = _warningsDb.First();
+        warning.PantryItemId.ShouldBe(boundaryItem.Id);
+        warning.WarningType.ShouldBe(PantryWarningConsts.ExpirationWarningType);
+        warning.IsActive.ShouldBeTrue();
+        warning.Message.ShouldContain("Próximo a vencer el");
+        warning.Message.ShouldContain(_referenceDate.AddDays(2).ToString("dd/MM/yyyy"));
+    }
+
+    [Fact]
     public async Task Should_Create_Warning_When_Expired()
     {
         // Venció hace 1 día
