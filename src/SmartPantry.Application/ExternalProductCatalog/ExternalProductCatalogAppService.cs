@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 
 namespace SmartPantry.ExternalProductCatalog;
 
+[Authorize]
 public class ExternalProductCatalogAppService : SmartPantryAppService, IExternalProductCatalogAppService
 {
     private readonly IExternalProductCatalogClient _externalClient;
