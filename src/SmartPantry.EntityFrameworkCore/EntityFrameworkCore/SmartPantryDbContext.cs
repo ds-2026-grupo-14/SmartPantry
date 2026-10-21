@@ -134,6 +134,8 @@ public class SmartPantryDbContext :
             b.Property(x => x.ProductId).IsRequired();
             b.Property(x => x.State).IsRequired();
             b.Property(x => x.ExpirationDate);
+            b.Property(x => x.Quantity).HasColumnType("decimal(18,2)");
+            b.Property(x => x.Unit).HasMaxLength(PantryConsts.MaxUnitLength);
 
             b.HasOne<Product>().WithMany().HasForeignKey(x => x.ProductId).IsRequired();
         });
