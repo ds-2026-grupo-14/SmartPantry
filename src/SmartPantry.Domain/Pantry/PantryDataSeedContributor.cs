@@ -102,9 +102,9 @@ public class PantryDataSeedContributor : IDataSeedContributor, ITransientDepende
             var adminItemExists = await _pantryItemRepository.FindAsync(x => x.UserId == adminUser.Id);
             if (adminItemExists == null)
             {
-                var arroz = await GetOrCreateSampleProductAsync("7791234567899", "Arroz Integral", ItemCategory.DryGoods, "Gallo", "1 kg");
-                var yogur = await GetOrCreateSampleProductAsync("7798765432109", "Yogur Frutilla", ItemCategory.Dairy, "Yogs", "200 g");
-                var fideos = await GetOrCreateSampleProductAsync("7790001112223", "Fideos Tallarines", ItemCategory.DryGoods, "Matarazzo", "500 g");
+                var arroz = await GetOrCreateSampleProductAsync("7799999000001", "Arroz Integral", ItemCategory.DryGoods, "Gallo", "1 kg");
+                var yogur = await GetOrCreateSampleProductAsync("7799999000002", "Yogur Frutilla", ItemCategory.Dairy, "Yogs", "200 g");
+                var fideos = await GetOrCreateSampleProductAsync("7799999000003", "Fideos Tallarines", ItemCategory.DryGoods, "Matarazzo", "500 g");
 
                 await _pantryItemRepository.InsertAsync(new PantryItem(
                     _guidGenerator.Create(),
