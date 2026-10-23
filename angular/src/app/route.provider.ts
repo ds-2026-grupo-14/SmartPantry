@@ -24,19 +24,5 @@ function configureRoutes() {
       order: 2,
       layout: eLayoutType.application,
     },
-    {
-      path: '/books',
-      name: '::Menu:Books',
-      iconClass: 'fas fa-book',
-      layout: eLayoutType.application,
-      requiredPolicy: 'SmartPantry.Books',
-    },
-    {
-      path: '/authors',
-      name: '::Menu:Authors',
-      iconClass: 'fas fa-user-edit',
-      layout: eLayoutType.application,
-      requiredPolicy: 'SmartPantry.Authors',
-    },
   ]);
 }
