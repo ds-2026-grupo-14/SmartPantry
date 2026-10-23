@@ -1,5 +1,6 @@
 import { authGuard, permissionGuard } from '@abp/ng.core';
 import { Routes } from '@angular/router';
+
 export const APP_ROUTES: Routes = [
   {
     path: '',
@@ -21,6 +22,11 @@ export const APP_ROUTES: Routes = [
   {
     path: 'setting-management',
     loadChildren: () => import('@abp/ng.setting-management').then(c => c.createRoutes()),
+  },
+  {
+    path: 'pantry',
+    loadComponent: () => import('./pantry/pantry.component').then(c => c.PantryComponent),
+    canActivate: [authGuard],
   },
   {
     path: 'books',
