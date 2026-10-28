@@ -32,16 +32,16 @@ public abstract class PantryAppServiceTests<TStartupModule> : SmartPantryApplica
 
     private async Task<Product> GetOrCreateSampleProductAsync()
     {
-        var product = await _productRepository.FirstOrDefaultAsync();
+        var product = await WithUnitOfWorkAsync(async () => await _productRepository.FirstOrDefaultAsync());
         if (product == null)
         {
-            product = await _productRepository.InsertAsync(new Product(
+            product = await WithUnitOfWorkAsync(async () => await _productRepository.InsertAsync(new Product(
                 Guid.NewGuid(),
                 "7790000000001",
                 "Producto Test",
                 ItemCategory.Other,
                 brand: "Marca Test"
-            ), autoSave: true);
+            ), autoSave: true));
         }
         return product;
     }
@@ -206,7 +206,7 @@ public abstract class PantryAppServiceTests<TStartupModule> : SmartPantryApplica
         consumed.State.ShouldBe(PantryItemState.Consumed);
 
         // Assert - Regla de Negocio 6: El ítem NO se elimina de la base de datos
-        var entityInDb = await _pantryItemRepository.FindAsync(created.Id);
+        var entityInDb = await WithUnitOfWorkAsync(async () => await _pantryItemRepository.FindAsync(created.Id));
         entityInDb.ShouldNotBeNull();
         entityInDb.State.ShouldBe(PantryItemState.Consumed);
     }
@@ -227,7 +227,7 @@ public abstract class PantryAppServiceTests<TStartupModule> : SmartPantryApplica
         await _pantryAppService.DeleteAsync(created.Id);
 
         // Assert - El ítem ya no existe en el repositorio
-        var entityInDb = await _pantryItemRepository.FindAsync(created.Id);
+        var entityInDb = await WithUnitOfWorkAsync(async () => await _pantryItemRepository.FindAsync(created.Id));
         entityInDb.ShouldBeNull();
 
         // Assert - Intentar GetAsync arroja EntityNotFoundException
