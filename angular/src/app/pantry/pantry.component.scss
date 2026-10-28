@@ -1,0 +1,23 @@
+.pantry {
+  max-width: 100%;
+  overflow-x: hidden;
+
+  .pantry-table {
+    table-layout: auto;
+    width: 100%;
+
+    td,
+    th {
+      word-break: break-word;
+    }
+  }
+
+  .pantry-consumed {
+    opacity: 0.65;
+
+    strong,
+    .fw-semibold {
+      text-decoration: line-through;
+    }
+  }
+}
