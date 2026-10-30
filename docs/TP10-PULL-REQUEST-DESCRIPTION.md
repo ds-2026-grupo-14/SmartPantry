@@ -46,24 +46,33 @@ Implementación completa de la capacidad de interfaz de usuario **"Mi despensa"*
 
 ## Evidencia
 
-### Matriz de Comprobaciones del TP10 (14 Condiciones Evaluadas)
+### Comprobaciones de todos los grupos
 
-| # | Condición Evaluada | Estado | Evidencia |
-|---|---|:---:|---|
-| 1 | **Ruta protegida y menú** | Cumplido | Menú lateral con ítem *"Mi despensa"* (`fas fa-box-open`), redirige a `/pantry` protegido con `authGuard`. |
-| 2 | **Estado de Carga (`loading`)** | Cumplido | Muestra spinner con texto `"Cargando ítems..."` mientras la petición está en curso; no adelanta mensaje de despensa vacía. |
-| 3 | **Estado de Despensa Vacía (`empty`)** | Cumplido | Si `totalCount === 0`, presenta banner informativo amigable `"No tienes productos en tu despensa."`. |
-| 4 | **Estado de Error con Reintento (`error`)** | Cumplido | Si la API falla, muestra alerta de error con botón `"Reintentar"`; al pulsarlo reejecuta `list.get()`. |
-| 5 | **Visualización de Ítems (`results`)** | Cumplido | Grilla con columnas: Producto, Cantidad, Unidad, Vencimiento, Estado y Acciones. |
-| 6 | **Datos Faltantes (RF-09)** | Cumplido | Campos nulos (`quantity`, `unit`, `expirationDate`) muestran `"No especificado"` sin inventar valores. |
-| 7 | **Paginación estándar** | Cumplido | Integración de `ListService` y `ngb-pagination` para navegación de páginas de 10 elementos. |
-| 8 | **Modal de Edición Reactivo** | Cumplido | Modal con campos reactivos para Cantidad, Unidad y Fecha de Vencimiento. |
-| 9 | **Validación en Cliente (Edición)** | Cumplido | Rechaza cantidades negativas (`min(0)`), unidades mayores a 32 caracteres y fechas inválidas en calendario. |
-| 10 | **Bloqueo durante Guardado** | Cumplido | Botón Guardar se deshabilita con spinner mientras la petición HTTP está activa (previene doble submit). |
-| 11 | **Resiliencia ante Fallo de Guardado**| Cumplido | Si el servidor rechaza el guardado, el formulario permanece abierto conservando los datos ingresados. |
-| 12 | **Consumo de Ítems (Regla de Negocio 6)**| Cumplido | Acción *"Consumir"* actualiza estado a badge `"Consumido"` y mantiene el ítem en la base de datos como historial. |
-| 13 | **Confirmación previa de Eliminación** | Cumplido | Acción *"Eliminar"* dispara diálogo modal (`ConfirmationService`); solo borra si el usuario confirma. |
-| 14 | **Diseño Responsivo** | Cumplido | Tabla adaptativa con contenedores responsivos que previenen scroll horizontal en dispositivos móviles. |
+*Completar esta tabla en el PR, indicando el componente, el servicio del proxy y los métodos utilizados por el grupo, y adjuntar las capturas indicadas.*
+
+| Pantalla o API | Condición | Resultado esperado | Componente, servicio del proxy y métodos utilizados | Captura / Evidencia |
+|---|---|---|---|---|
+| **Navegación** | Acceso a la URL sin sesión | Redirección al login de ABP | `app.routes.ts` (`canActivate: [authGuard]`) | *[Adjuntar captura de redirección a /account/login]* |
+| **Menú** | Usuario autenticado | Aparece “Mi despensa” y navega a la pantalla | `route.provider.ts` (`RoutesService`, `::Menu:MyPantry`) | *[Adjuntar captura del menú lateral y navegación]* |
+| **Listado** | Respuesta pendiente | Estado de carga; sin mensaje de lista vacía | `PantryComponent` (`viewStatus = 'loading'`, spinner con `::Pantry:Loading`) | *[Adjuntar captura del estado de carga / spinner]* |
+| **Listado** | BackEnd detenido | Estado de error con mensaje comprensible y opción de reintentar | `PantryComponent` (`viewStatus = 'error'`, botón reintentar con `retry()`, `{ skipHandleError: true }`) | *[Adjuntar captura del estado de error y botón reintentar]* |
+| **Listado** | Usuario sin ítems | Lista vacía con mensaje localizado | `PantryComponent` (`viewStatus = 'empty'`, `::Pantry:Empty`) | *[Adjuntar captura de despensa vacía con mensaje]* |
+| **Listado** | Usuario con ítems | Solo sus ítems; datos faltantes comunicados sin inventar valores | `PantryComponent` (`pantryService.getList(...)`), `::Pantry:NotSpecified` | *[Adjuntar captura de lista con ítems y textos "No especificado"]* |
+| **Edición** | Cantidad negativa o fecha inválida | Mensaje de validación localizado; no se invoca al servidor | `PantryComponent` (`Validators.min(0)`, `calendarDateValidator`) | *[Adjuntar captura del modal con mensaje de validación]* |
+| **Edición** | Datos válidos | Cambio visible en la lista y persistido | `PantryComponent` (`pantryService.update(id, input)`) | Cambiamos la cantidad de 1 a 3 y, al guardar, la lista mostró 3. <br> *[Adjuntar captura de la lista mostrando la cantidad actualizada]* |
+| **Consumo** | Marcar un ítem | Estado actualizado según la decisión documentada | `PantryComponent` (`pantryService.consume(id)`) | Apareció como ‘Consumido’ y permaneció en la lista. <br> *[Adjuntar captura del producto con badge "Consumido" en la lista]* |
+| **Eliminación** | Cancelar la confirmación | El ítem permanece; sin llamada al servidor | `PantryComponent` (`confirmation.warn(...)`, `Status.reject`) | Cancelamos el diálogo y el producto siguió en la lista. <br> *[Adjuntar captura del resultado después de cancelar]* |
+| **Eliminación** | Confirmar | El ítem desaparece de la lista y de la base | `PantryComponent` (`pantryService.delete(id)`) | Confirmamos; desapareció de la lista y la consulta posterior no lo encontró. <br> *[Adjuntar captura del resultado después de confirmar]* |
+| **API de despensa** | Ítem de otro usuario, con Bearer válido (Swagger) | No se lee ni se modifica; 404 o 403 según lo documentado | `PantryAppService` (`GetOwnedItemAsync`, lanza `AbpAuthorizationException`) | *[Adjuntar captura de Swagger con respuesta 403 Forbidden]* |
+| **API de despensa** | Perfil sin sesión y sin token | 401 | `PantryAppService` anotado con `[Authorize]` | *[Adjuntar captura de Swagger o Postman con respuesta 401 Unauthorized]* |
+| **Idioma** | Cambio entre español e inglés | Todos los textos de la pantalla cambian | `LocalizationPipe` (`abpLocalization`), recursos `es.json` y `en.json` | *[Adjuntar capturas comparativas en Español e Inglés]* |
+
+> **Nota sobre evidencias de eliminación requeridas por la corrección docente:**
+> 1. Captura del diálogo modal de confirmación abierto.
+> 2. Captura del resultado inmediatamente **después de cancelar** (el producto continúa en la lista).
+> 3. Captura del resultado inmediatamente **después de confirmar** (el producto desaparece de la lista).
+
+> Compilar el BackEnd, ejecutar las pruebas existentes y las del componente, y verificar que el worker del TP08 continúa funcionando sin usuario conectado.
 
 ## Decisiones o dudas para la revisión
 - **Historial de consumidos:** Se decidió no eliminar el registro de la base de datos al consumirse, sino cambiar su estado a `Consumed` y mostrarlo con un badge diferenciado en la misma grilla, cumpliendo estrictamente con la Regla de Negocio 6.
