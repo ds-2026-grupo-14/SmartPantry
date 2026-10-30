@@ -106,23 +106,27 @@ Esta sección documenta y justifica las decisiones de diseño adoptadas en la im
 
 ---
 
-### Matriz de Comprobaciones de Rúbrica — TP10 (Checklist para PR)
+### Comprobaciones de todos los grupos
 
-Esta tabla resume las 14 condiciones funcionales y no funcionales evaluadas en el TP10, lista para ser utilizada como referencia en la descripción del Pull Request:
+> **Consigna:** Completar esta tabla en el PR, indicando el componente, el servicio del proxy y los métodos utilizados por el grupo, y adjuntar las capturas indicadas.
 
-| # | Condición Evaluada | Estado | Criterio de Verificación / Evidencia |
-|---|---|:---:|---|
-| 1 | **Ruta protegida y menú** | Cumplido | Menú lateral con ítem *"Mi despensa"* (`fas fa-box-open`), redirige a `/pantry` protegido con `authGuard`. |
-| 2 | **Estado de Carga (`loading`)** | Cumplido | Muestra spinner con texto `"Cargando ítems..."` mientras la petición está en curso; no adelanta mensaje de despensa vacía. |
-| 3 | **Estado de Despensa Vacía (`empty`)** | Cumplido | Si `totalCount === 0`, presenta banner informativo amigable `"No tienes productos en tu despensa."`. |
-| 4 | **Estado de Error con Reintento (`error`)** | Cumplido | Si la API falla, muestra alerta de error con botón `"Reintentar"`; al pulsarlo reejecuta `list.get()`. |
-| 5 | **Visualización de Ítems (`results`)** | Cumplido | Grilla con columnas: Producto, Cantidad, Unidad, Vencimiento, Estado y Acciones. |
-| 6 | **Datos Faltantes (RF-09)** | Cumplido | Campos nulos (`quantity`, `unit`, `expirationDate`) muestran `"No especificado"` sin inventar valores. |
-| 7 | **Paginación estándar** | Cumplido | Integración de `ListService` y `ngb-pagination` para navegación de páginas de 10 elementos. |
-| 8 | **Modal de Edición Reactivo** | Cumplido | Modal con campos reactivos para Cantidad, Unidad y Fecha de Vencimiento. |
-| 9 | **Validación en Cliente (Edición)** | Cumplido | Rechaza cantidades negativas (`min(0)`), unidades mayores a 32 caracteres y fechas inválidas en calendario. |
-| 10 | **Bloqueo durante Guardado** | Cumplido | Botón Guardar se deshabilita con spinner mientras la petición HTTP está activa (previene doble submit). |
-| 11 | **Resiliencia ante Fallo de Guardado**| Cumplido | Si el servidor rechaza el guardado, el formulario permanece abierto conservando los datos ingresados. |
-| 12 | **Consumo de Ítems (Regla de Negocio 6)**| Cumplido | Acción *"Consumir"* actualiza estado a badge `"Consumido"` y mantiene el ítem en la base de datos como historial. |
-| 13 | **Confirmación previa de Eliminación** | Cumplido | Acción *"Eliminar"* dispara diálogo modal (`ConfirmationService`); solo borra si el usuario confirma. |
-| 14 | **Diseño Responsivo** | Cumplido | Tabla adaptativa con contenedores responsivos que previenen scroll horizontal en dispositivos móviles. |
+| Pantalla o API | Condición | Resultado esperado | Componente, Servicio del Proxy y Métodos | Evidencia / Estado |
+|---|---|---|---|:---:|
+| **Navegación** | Acceso a la URL sin sesión | Redirección al login de ABP | `app.routes.ts` (`canActivate: [authGuard]`) | Cumplido (Redirección automática al login de ABP) |
+| **Menú** | Usuario autenticado | Aparece “Mi despensa” y navega a la pantalla | `route.provider.ts` (`RoutesService`, `::Menu:MyPantry`) | Cumplido (Ítem visible con icono `fas fa-box-open` -> navega a `/pantry`) |
+| **Listado** | Respuesta pendiente | Estado de carga; sin mensaje de lista vacía | `PantryComponent` (`viewStatus = 'loading'`, `::Pantry:Loading`) | Cumplido (Spinner activo con mensaje de carga; no muestra banner de vacía) |
+| **Listado** | BackEnd detenido | Estado de error con mensaje comprensible y opción de reintentar | `PantryComponent` (`viewStatus = 'error'`, `retry()` -> `list.get()`, `skipHandleError: true`) | Cumplido (Alerta con mensaje comprensible y botón de reintento en línea) |
+| **Listado** | Usuario sin ítems | Lista vacía con mensaje localizado | `PantryComponent` (`viewStatus = 'empty'`, `::Pantry:Empty`) | Cumplido (Mensaje localizado `"No tienes productos en tu despensa."`) |
+| **Listado** | Usuario con ítems | Solo sus ítems; datos faltantes comunicados sin inventar valores | `PantryComponent` (`pantryService.getList`), `::Pantry:NotSpecified` | Cumplido (Aislamiento por `CurrentUser.GetId()`; valores nulos como `"No especificado"`) |
+| **Edición** | Cantidad negativa o fecha inválida | Mensaje de validación localizado; no se invoca al servidor | `PantryComponent` (`Validators.min(0)`, `calendarDateValidator`) | Cumplido (Validación reactiva con mensaje de error; no invoca a la API) |
+| **Edición** | Datos válidos | Cambio visible en la lista y persistido | `PantryComponent` (`pantryService.update(id, input)`) | Cumplido: Cambiamos la cantidad de 1 a 3 y, al guardar, la lista mostró 3 de forma persistida en BD |
+| **Consumo** | Marcar un ítem | Estado actualizado según la decisión documentada | `PantryComponent` (`pantryService.consume(id)`) | Cumplido: Apareció como ‘Consumido’ y permaneció en la lista según la RN-6 |
+| **Eliminación** | Cancelar la confirmación | El ítem permanece; sin llamada al servidor | `PantryComponent` (`ConfirmationService`, `Status.reject`) | Cumplido: Cancelamos el diálogo y el producto siguió en la lista (sin invocación al backend) |
+| **Eliminación** | Confirmar | El ítem desaparece de la lista y de la base | `PantryComponent` (`pantryService.delete(id)`) | Cumplido: Confirmamos; desapareció de la lista y la consulta posterior no lo encontró |
+| **API de despensa** | Ítem de otro usuario, con Bearer válido (Swagger) | No se lee ni se modifica; 404 o 403 según lo documentado | `PantryAppService` (`GetOwnedItemAsync`) | Cumplido (**403 Forbidden** vía `AbpAuthorizationException`) |
+| **API de despensa** | Perfil sin sesión y sin token | 401 | `PantryAppService` con atributo `[Authorize]` | Cumplido (**401 Unauthorized** retornado por ABP) |
+| **Idioma** | Cambio entre español e inglés | Todos los textos de la pantalla cambian | `LocalizationPipe` (`abpLocalization`), recursos `es.json` / `en.json` | Cumplido (Traducción completa de textos de menú, tablas, modales y botones) |
+
+> *Compilar el BackEnd, ejecutar las pruebas existentes y las del componente, y verificar que el worker del TP08 continúa funcionando sin usuario conectado.*
+> 
+> *Nota sobre evidencias de eliminación: Se adjunta la captura del diálogo de confirmación abierto, la captura del resultado tras cancelar (el ítem sigue en la lista) y la captura tras confirmar (el ítem desaparece).*
