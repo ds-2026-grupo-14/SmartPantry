@@ -76,6 +76,7 @@ Antes de diseñar o modificar cualquier archivo, abre obligatoriamente el docume
 | Rutas `/api/app/*`, DTOs JSON, paginación o cliente Open Food Facts (v3 / POST) | `docs/04_api_contracts_and_integrations.md` |
 | Árbol de carpetas, nombres, manejo de errores, snippets modelo o tests/cobertura | `docs/05_coding_standards_and_patterns.md` |
 | Autenticación OpenIddict, permisos RBAC, `401`/`403`, CORS, Rate Limit o secretos | `docs/06_security_and_auth.md` |
+| Diagrama de Clases de Diseño (DCD UML 2.5), relaciones, métodos e invariantes | `docs/07_design_class_diagram.md` |
 | Estado de avance por bloques, dependencias entre tareas y próximos tickets | `TASK_ROADMAP.md` |
 
 ### Mapa Rápido de Aislamiento por Bloques (`TASK_ROADMAP.md`)
