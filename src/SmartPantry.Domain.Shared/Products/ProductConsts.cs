@@ -12,4 +12,9 @@ public static class ProductConsts
     public const int MaxQuantityLength = 32;
     public const int MaxIngredientsLength = 1024;
     public const int MaxAllergensLength = 256;
+    public const int MaxExternalCategoriesLength = 256;
+    public const int MaxImageUrlLength = 512;
+    public const int MaxNutriScoreLength = 1;
+    public const int MinNovaGroup = 1;
+    public const int MaxNovaGroup = 4;
 }

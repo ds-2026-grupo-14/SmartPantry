@@ -41,11 +41,11 @@ Los requerimientos faltantes y parciales se dividen en **4 bloques verticales au
 **Documentos rectores:** `docs/02_data_models_and_schemas.md` (§3.1), `docs/03_business_rules_and_workflows.md` (`BR-001`, `BR-002`, `BR-004`), `docs/04_api_contracts_and_integrations.md` (§2.1, §2.2, §3).
 
 ### Backlog Secuencial del Bloque 1
-- [ ] **B1-T01 — Ampliación del Dominio `Product` para Ficha Nutricional Completa (`RF-07`)**
+- [x] **B1-T01 — Ampliación del Dominio `Product` para Ficha Nutricional Completa (`RF-07`)**
   - **Acción:** Extender `ProductConsts` (`MaxExternalCategoriesLength = 256`, `MaxImageUrlLength = 512`, `MaxNutriScoreLength = 1`) y `Product.cs` con las propiedades opcionales `ExternalCategories`, `ImageUrl`, `NutriScore` (`A`..`E`) y `NovaGroup` (`1`..`4`), protegiendo sus invariantes en métodos `Set*` y `Update`.
   - **Criterio de cierre:** Pruebas unitarias en `ProductDomainTests.cs` cubriendo valores válidos, nulos y rechazos fuera de rango (`NutriScore = "Z"`, `NovaGroup = 5`).
 
-- [ ] **B1-T02 — Migración EF Core de `AppProducts` (`RF-07`, `RF-08`)**
+- [x] **B1-T02 — Migración EF Core de `AppProducts` (`RF-07`, `RF-08`)**
   - **Acción:** Configurar las nuevas columnas y restricciones en `SmartPantryDbContext.cs`, generar migración `AddProductNutritionalDetails` y verificar su aplicación limpia con `SmartPantry.DbMigrator`.
   - **Criterio de cierre:** Esquema actualizado en SQL Server manteniendo intacto el índice único `IX_AppProducts_Barcode`.
 

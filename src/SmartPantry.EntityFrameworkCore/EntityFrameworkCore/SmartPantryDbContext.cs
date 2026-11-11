@@ -122,6 +122,10 @@ public class SmartPantryDbContext :
             b.Property(x => x.Quantity).HasMaxLength(ProductConsts.MaxQuantityLength);
             b.Property(x => x.Ingredients).HasMaxLength(ProductConsts.MaxIngredientsLength);
             b.Property(x => x.Allergens).HasMaxLength(ProductConsts.MaxAllergensLength);
+            b.Property(x => x.ExternalCategories).HasMaxLength(ProductConsts.MaxExternalCategoriesLength);
+            b.Property(x => x.ImageUrl).HasMaxLength(ProductConsts.MaxImageUrlLength);
+            b.Property(x => x.NutriScore).HasMaxLength(ProductConsts.MaxNutriScoreLength);
+            b.Property(x => x.NovaGroup);
 
             b.HasIndex(x => x.Barcode).IsUnique();
         });

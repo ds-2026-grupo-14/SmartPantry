@@ -13,6 +13,10 @@ public class Product : BasicAggregateRoot<Guid>
     public string? Quantity { get; private set; }
     public string? Ingredients { get; private set; }
     public string? Allergens { get; private set; }
+    public string? ExternalCategories { get; private set; }
+    public string? ImageUrl { get; private set; }
+    public string? NutriScore { get; private set; }
+    public int? NovaGroup { get; private set; }
 
     // Constructor sin parámetros requerido por Entity Framework Core
     protected Product()
@@ -28,7 +32,11 @@ public class Product : BasicAggregateRoot<Guid>
         string? brand = null,
         string? quantity = null,
         string? ingredients = null,
-        string? allergens = null) : base(id)
+        string? allergens = null,
+        string? externalCategories = null,
+        string? imageUrl = null,
+        string? nutriScore = null,
+        int? novaGroup = null) : base(id)
     {
         SetBarcode(barcode);
         SetName(name);
@@ -37,6 +45,7 @@ public class Product : BasicAggregateRoot<Guid>
         SetQuantity(quantity);
         SetIngredients(ingredients);
         SetAllergens(allergens);
+        SetNutritionalMetadata(imageUrl, nutriScore, novaGroup, externalCategories);
     }
 
     public void Update(
@@ -45,7 +54,11 @@ public class Product : BasicAggregateRoot<Guid>
         string? brand = null,
         string? quantity = null,
         string? ingredients = null,
-        string? allergens = null)
+        string? allergens = null,
+        string? externalCategories = null,
+        string? imageUrl = null,
+        string? nutriScore = null,
+        int? novaGroup = null)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -87,12 +100,21 @@ public class Product : BasicAggregateRoot<Guid>
             throw new ArgumentException($"Los alérgenos no pueden superar los {ProductConsts.MaxAllergensLength} caracteres.", nameof(allergens));
         }
 
+        var normalizedExternalCategories = NormalizeAndValidateExternalCategories(externalCategories);
+        var normalizedImageUrl = NormalizeAndValidateImageUrl(imageUrl);
+        var normalizedNutriScore = NormalizeAndValidateNutriScore(nutriScore);
+        ValidateNovaGroup(novaGroup);
+
         Name = normalizedName;
         Category = category;
         Brand = string.IsNullOrEmpty(normalizedBrand) ? null : normalizedBrand;
         Quantity = string.IsNullOrEmpty(normalizedQuantity) ? null : normalizedQuantity;
         Ingredients = string.IsNullOrEmpty(normalizedIngredients) ? null : normalizedIngredients;
         Allergens = string.IsNullOrEmpty(normalizedAllergens) ? null : normalizedAllergens;
+        ExternalCategories = normalizedExternalCategories;
+        ImageUrl = normalizedImageUrl;
+        NutriScore = normalizedNutriScore;
+        NovaGroup = novaGroup;
     }
 
     // Métodos para proteger el estado válido y normalizar texto
@@ -186,5 +208,101 @@ public class Product : BasicAggregateRoot<Guid>
         }
 
         Allergens = string.IsNullOrEmpty(allergens) ? null : allergens;
+    }
+
+    public void SetExternalCategories(string? externalCategories)
+    {
+        ExternalCategories = NormalizeAndValidateExternalCategories(externalCategories);
+    }
+
+    public void SetImageUrl(string? imageUrl)
+    {
+        ImageUrl = NormalizeAndValidateImageUrl(imageUrl);
+    }
+
+    public void SetNutriScore(string? nutriScore)
+    {
+        NutriScore = NormalizeAndValidateNutriScore(nutriScore);
+    }
+
+    public void SetNovaGroup(int? novaGroup)
+    {
+        ValidateNovaGroup(novaGroup);
+        NovaGroup = novaGroup;
+    }
+
+    public void SetNutritionalMetadata(string? imageUrl, string? nutriScore, int? novaGroup, string? externalCategories)
+    {
+        var normalizedExternalCategories = NormalizeAndValidateExternalCategories(externalCategories);
+        var normalizedImageUrl = NormalizeAndValidateImageUrl(imageUrl);
+        var normalizedNutriScore = NormalizeAndValidateNutriScore(nutriScore);
+        ValidateNovaGroup(novaGroup);
+
+        ExternalCategories = normalizedExternalCategories;
+        ImageUrl = normalizedImageUrl;
+        NutriScore = normalizedNutriScore;
+        NovaGroup = novaGroup;
+    }
+
+    private static string? NormalizeAndValidateExternalCategories(string? externalCategories)
+    {
+        var normalized = externalCategories?.Trim();
+        if (string.IsNullOrEmpty(normalized))
+        {
+            return null;
+        }
+
+        if (normalized.Length > ProductConsts.MaxExternalCategoriesLength)
+        {
+            throw new ArgumentException($"Las categorías externas no pueden superar los {ProductConsts.MaxExternalCategoriesLength} caracteres.", nameof(externalCategories));
+        }
+
+        return normalized;
+    }
+
+    private static string? NormalizeAndValidateImageUrl(string? imageUrl)
+    {
+        var normalized = imageUrl?.Trim();
+        if (string.IsNullOrEmpty(normalized))
+        {
+            return null;
+        }
+
+        if (normalized.Length > ProductConsts.MaxImageUrlLength)
+        {
+            throw new ArgumentException($"La URL de la imagen no puede superar los {ProductConsts.MaxImageUrlLength} caracteres.", nameof(imageUrl));
+        }
+
+        if (!Uri.TryCreate(normalized, UriKind.Absolute, out var uri) ||
+            (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+        {
+            throw new ArgumentException("La URL de la imagen debe ser una URI absoluta válida con esquema http o https.", nameof(imageUrl));
+        }
+
+        return normalized;
+    }
+
+    private static string? NormalizeAndValidateNutriScore(string? nutriScore)
+    {
+        var normalized = nutriScore?.Trim().ToUpperInvariant();
+        if (string.IsNullOrEmpty(normalized))
+        {
+            return null;
+        }
+
+        if (normalized is not ("A" or "B" or "C" or "D" or "E"))
+        {
+            throw new ArgumentException("El Nutri-Score debe ser A, B, C, D o E.", nameof(nutriScore));
+        }
+
+        return normalized;
+    }
+
+    private static void ValidateNovaGroup(int? novaGroup)
+    {
+        if (novaGroup.HasValue && (novaGroup.Value < ProductConsts.MinNovaGroup || novaGroup.Value > ProductConsts.MaxNovaGroup))
+        {
+            throw new ArgumentException($"El grupo NOVA debe estar comprendido entre {ProductConsts.MinNovaGroup} y {ProductConsts.MaxNovaGroup}.", nameof(novaGroup));
+        }
     }
 }

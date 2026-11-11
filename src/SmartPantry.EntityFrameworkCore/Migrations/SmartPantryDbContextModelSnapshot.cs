@@ -282,6 +282,14 @@ namespace SmartPantry.Migrations
                     b.Property<int>("Category")
                         .HasColumnType("int");
 
+                    b.Property<string>("ExternalCategories")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("ImageUrl")
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
                     b.Property<string>("Ingredients")
                         .HasMaxLength(1024)
                         .HasColumnType("nvarchar(1024)");
@@ -290,6 +298,13 @@ namespace SmartPantry.Migrations
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
+
+                    b.Property<int?>("NovaGroup")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NutriScore")
+                        .HasMaxLength(1)
+                        .HasColumnType("nvarchar(1)");
 
                     b.Property<string>("Quantity")
                         .HasMaxLength(32)
