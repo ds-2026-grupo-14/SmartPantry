@@ -1,8 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace SmartPantry.Products;
 
-public class CreateProductDto
+public class CreateProductDto : IValidatableObject
 {
     [Required]
     [StringLength(ProductConsts.MaxBarcodeLength)]
@@ -13,6 +14,7 @@ public class CreateProductDto
     public string Name { get; set; } = string.Empty;
 
     [Required]
+    [Range((int)ItemCategory.Dairy, (int)ItemCategory.Other)]
     public ItemCategory Category { get; set; }
 
     [StringLength(ProductConsts.MaxBrandLength)]
@@ -26,4 +28,20 @@ public class CreateProductDto
 
     [StringLength(ProductConsts.MaxAllergensLength)]
     public string? Allergens { get; set; }
+
+    [StringLength(ProductConsts.MaxExternalCategoriesLength)]
+    public string? ExternalCategories { get; set; }
+
+    [StringLength(ProductConsts.MaxImageUrlLength)]
+    public string? ImageUrl { get; set; }
+
+    [StringLength(ProductConsts.MaxNutriScoreLength)]
+    [RegularExpression("^[A-Ea-e]$")]
+    public string? NutriScore { get; set; }
+
+    [Range(ProductConsts.MinNovaGroup, ProductConsts.MaxNovaGroup)]
+    public int? NovaGroup { get; set; }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        => ProductDtoValidation.ValidateImageUrl(ImageUrl);
 }

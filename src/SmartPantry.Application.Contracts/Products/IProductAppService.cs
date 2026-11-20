@@ -14,4 +14,5 @@ public interface IProductAppService :
         CreateProductDto,
         UpdateProductDto>
 {
+    Task<ProductDto> SaveFromExternalAsync(SaveExternalProductDto input);
 }

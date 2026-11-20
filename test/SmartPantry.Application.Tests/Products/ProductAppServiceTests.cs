@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Shouldly;
 using SmartPantry.Products;
+using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories;
@@ -88,7 +89,11 @@ public abstract class ProductAppServiceTests<TStartupModule> : SmartPantryApplic
             Brand = "Gallo",
             Quantity = "1kg",
             Ingredients = "Arroz integral",
-            Allergens = "Ninguno"
+            Allergens = "Ninguno",
+            ExternalCategories = "Cereales, Arroces",
+            ImageUrl = "https://images.openfoodfacts.org/arroz.jpg",
+            NutriScore = "a",
+            NovaGroup = 1
         };
 
         var createdProduct = await _productAppService.CreateAsync(createInput);
@@ -102,6 +107,10 @@ public abstract class ProductAppServiceTests<TStartupModule> : SmartPantryApplic
         createdProduct.Quantity.ShouldBe("1kg");
         createdProduct.Ingredients.ShouldBe("Arroz integral");
         createdProduct.Allergens.ShouldBe("Ninguno");
+        createdProduct.ExternalCategories.ShouldBe("Cereales, Arroces");
+        createdProduct.ImageUrl.ShouldBe("https://images.openfoodfacts.org/arroz.jpg");
+        createdProduct.NutriScore.ShouldBe("A");
+        createdProduct.NovaGroup.ShouldBe(1);
 
         var productId = createdProduct.Id;
 
@@ -128,7 +137,11 @@ public abstract class ProductAppServiceTests<TStartupModule> : SmartPantryApplic
             Brand = "Gallo Oro",
             Quantity = "500g",
             Ingredients = "Arroz parboil seleccionado",
-            Allergens = "Puede contener trazas de soja"
+            Allergens = "Puede contener trazas de soja",
+            ExternalCategories = "Arroces seleccionados",
+            ImageUrl = "https://images.openfoodfacts.org/arroz-v2.jpg",
+            NutriScore = "b",
+            NovaGroup = 2
         };
 
         var updatedProduct = await _productAppService.UpdateAsync(productId, updateInput);
@@ -141,6 +154,10 @@ public abstract class ProductAppServiceTests<TStartupModule> : SmartPantryApplic
         updatedProduct.Quantity.ShouldBe("500g");
         updatedProduct.Ingredients.ShouldBe("Arroz parboil seleccionado");
         updatedProduct.Allergens.ShouldBe("Puede contener trazas de soja");
+        updatedProduct.ExternalCategories.ShouldBe("Arroces seleccionados");
+        updatedProduct.ImageUrl.ShouldBe("https://images.openfoodfacts.org/arroz-v2.jpg");
+        updatedProduct.NutriScore.ShouldBe("B");
+        updatedProduct.NovaGroup.ShouldBe(2);
 
         
         // 4. Consultar (GetAsync)
@@ -156,6 +173,10 @@ public abstract class ProductAppServiceTests<TStartupModule> : SmartPantryApplic
         retrievedProduct.Quantity.ShouldBe("500g");
         retrievedProduct.Ingredients.ShouldBe("Arroz parboil seleccionado");
         retrievedProduct.Allergens.ShouldBe("Puede contener trazas de soja");
+        retrievedProduct.ExternalCategories.ShouldBe("Arroces seleccionados");
+        retrievedProduct.ImageUrl.ShouldBe("https://images.openfoodfacts.org/arroz-v2.jpg");
+        retrievedProduct.NutriScore.ShouldBe("B");
+        retrievedProduct.NovaGroup.ShouldBe(2);
 
         
         // 5. Eliminar (DeleteAsync)
@@ -173,6 +194,175 @@ public abstract class ProductAppServiceTests<TStartupModule> : SmartPantryApplic
         // Verificación adicional a nivel de persistencia en el repositorio
         var entityInDb = await _productRepository.FindAsync(productId);
         entityInDb.ShouldBeNull();
+    }
+
+    [Fact]
+    public async Task Should_Reject_Duplicate_Barcode_On_CreateAsync()
+    {
+        // Arrange
+        await _productAppService.CreateAsync(new CreateProductDto
+        {
+            Barcode = "7795555111222",
+            Name = "Producto Inicial",
+            Category = ItemCategory.Beverages
+        });
+
+        // Act & Assert
+        var exception = await Should.ThrowAsync<BusinessException>(async () =>
+        {
+            await _productAppService.CreateAsync(new CreateProductDto
+            {
+                Barcode = "  7795555111222  ",
+                Name = "Producto Duplicado",
+                Category = ItemCategory.Beverages
+            });
+        });
+
+        exception.Code.ShouldBe(SmartPantryDomainErrorCodes.DuplicateProductBarcode);
+    }
+
+    [Fact]
+    public async Task Should_Save_From_External_Idempotently_And_Enrich_Missing_Metadata()
+    {
+        // Arrange & Act 1: First external save with partial metadata
+        var firstInput = new SaveExternalProductDto
+        {
+            Barcode = "  7790895000997  ",
+            Name = "Galletitas Dulces Rellenas Sabor Chocolate",
+            Category = ItemCategory.Snacks,
+            Brand = "Bagley",
+            Quantity = null,
+            Ingredients = null,
+            Allergens = null,
+            ExternalCategories = null,
+            ImageUrl = null,
+            NutriScore = null,
+            NovaGroup = null
+        };
+
+        var firstResult = await _productAppService.SaveFromExternalAsync(firstInput);
+
+        firstResult.ShouldNotBeNull();
+        firstResult.Id.ShouldNotBe(Guid.Empty);
+        firstResult.Barcode.ShouldBe("7790895000997");
+        firstResult.Brand.ShouldBe("Bagley");
+        firstResult.NutriScore.ShouldBeNull();
+        firstResult.NovaGroup.ShouldBeNull();
+
+        // Act 2: Second external save with same barcode, different Name/Brand, and missing metadata filled
+        var secondInput = new SaveExternalProductDto
+        {
+            Barcode = "7790895000997",
+            Name = "Nombre Alternativo No Debe Sobrescribir",
+            Category = ItemCategory.Other,
+            Brand = "Otra Marca No Debe Sobrescribir",
+            Quantity = "118 g",
+            Ingredients = "Harina de trigo enriquecida, azúcar, cacao en polvo",
+            Allergens = "en:gluten, en:milk",
+            ExternalCategories = "Snacks dulces, Galletas",
+            ImageUrl = "https://images.openfoodfacts.org/images/products/779/089/500/0997/front_es.jpg",
+            NutriScore = "e",
+            NovaGroup = 4
+        };
+
+        var secondResult = await _productAppService.SaveFromExternalAsync(secondInput);
+
+        // Assert: Same Id, original non-null properties preserved, null metadata enriched, single record in DB
+        secondResult.ShouldNotBeNull();
+        secondResult.Id.ShouldBe(firstResult.Id);
+        secondResult.Barcode.ShouldBe("7790895000997");
+        secondResult.Name.ShouldBe("Galletitas Dulces Rellenas Sabor Chocolate");
+        secondResult.Category.ShouldBe(ItemCategory.Snacks);
+        secondResult.Brand.ShouldBe("Bagley");
+        secondResult.Quantity.ShouldBe("118 g");
+        secondResult.Ingredients.ShouldBe("Harina de trigo enriquecida, azúcar, cacao en polvo");
+        secondResult.Allergens.ShouldBe("en:gluten, en:milk");
+        secondResult.ExternalCategories.ShouldBe("Snacks dulces, Galletas");
+        secondResult.ImageUrl.ShouldBe("https://images.openfoodfacts.org/images/products/779/089/500/0997/front_es.jpg");
+        secondResult.NutriScore.ShouldBe("E");
+        secondResult.NovaGroup.ShouldBe(4);
+
+        var countInDb = await WithUnitOfWorkAsync(async () =>
+            await _productRepository.CountAsync(x => x.Barcode == "7790895000997"));
+        countInDb.ShouldBe(1);
+
+        // Act 3: Third external save when all metadata is already populated should keep everything untouched
+        var thirdResult = await _productAppService.SaveFromExternalAsync(new SaveExternalProductDto
+        {
+            Barcode = "7790895000997",
+            Name = "Otro Nombre",
+            Category = ItemCategory.Beverages,
+            Brand = "Otra Marca",
+            Quantity = "500 g",
+            Ingredients = "Otros ingredientes",
+            Allergens = "en:peanuts",
+            ExternalCategories = "Bebidas",
+            ImageUrl = "https://images.openfoodfacts.org/other.jpg",
+            NutriScore = "a",
+            NovaGroup = 1
+        });
+
+        thirdResult.Id.ShouldBe(firstResult.Id);
+        thirdResult.Name.ShouldBe("Galletitas Dulces Rellenas Sabor Chocolate");
+        thirdResult.Category.ShouldBe(ItemCategory.Snacks);
+        thirdResult.Brand.ShouldBe("Bagley");
+        thirdResult.Quantity.ShouldBe("118 g");
+        thirdResult.Ingredients.ShouldBe("Harina de trigo enriquecida, azúcar, cacao en polvo");
+        thirdResult.Allergens.ShouldBe("en:gluten, en:milk");
+        thirdResult.ExternalCategories.ShouldBe("Snacks dulces, Galletas");
+        thirdResult.ImageUrl.ShouldBe("https://images.openfoodfacts.org/images/products/779/089/500/0997/front_es.jpg");
+        thirdResult.NutriScore.ShouldBe("E");
+        thirdResult.NovaGroup.ShouldBe(4);
+    }
+
+    [Theory]
+    [InlineData(ItemCategory.Undefined, null, null, null)]
+    [InlineData(ItemCategory.Snacks, "Z", null, null)]
+    [InlineData(ItemCategory.Snacks, null, 5, null)]
+    [InlineData(ItemCategory.Snacks, null, null, "ftp://example.com/img.jpg")]
+    [InlineData(ItemCategory.Snacks, null, null, "not-a-url")]
+    public async Task Should_Reject_Invalid_Dto_Fields_On_SaveFromExternalAsync(
+        ItemCategory category,
+        string? nutriScore,
+        int? novaGroup,
+        string? imageUrl)
+    {
+        var invalidInput = new SaveExternalProductDto
+        {
+            Barcode = "7790895000998",
+            Name = "Producto Test",
+            Category = category,
+            NutriScore = nutriScore,
+            NovaGroup = novaGroup,
+            ImageUrl = imageUrl
+        };
+
+        await Should.ThrowAsync<AbpValidationException>(async () =>
+        {
+            await _productAppService.SaveFromExternalAsync(invalidInput);
+        });
+    }
+
+    [Theory]
+    [InlineData(ItemCategory.Undefined, null)]
+    [InlineData(ItemCategory.Dairy, "ftp://example.com/img.jpg")]
+    [InlineData(ItemCategory.Dairy, "not-a-url")]
+    public async Task Should_Reject_Invalid_Category_Or_ImageUrl_On_CreateAsync(
+        ItemCategory category,
+        string? imageUrl)
+    {
+        var invalidInput = new CreateProductDto
+        {
+            Barcode = "7790895000999",
+            Name = "Producto Test",
+            Category = category,
+            ImageUrl = imageUrl
+        };
+
+        await Should.ThrowAsync<AbpValidationException>(async () =>
+        {
+            await _productAppService.CreateAsync(invalidInput);
+        });
     }
 }
 

@@ -67,6 +67,7 @@
     "Pantry:Validation:QuantityNonNegative": "La cantidad debe ser mayor o igual a 0.",
     "Pantry:Validation:InvalidExpirationDate": "Ingrese una fecha de calendario válida.",
     "Pantry:Validation:UnitMaxLength": "La unidad no puede superar los 32 caracteres.",
-    "Pantry:SaveError": "No se pudo guardar el ítem. Revise los datos ingresados."
+    "Pantry:SaveError": "No se pudo guardar el ítem. Revise los datos ingresados.",
+    "SmartPantry:Product:DuplicateBarcode": "Ya existe un producto registrado con ese código de barras."
   }
 }

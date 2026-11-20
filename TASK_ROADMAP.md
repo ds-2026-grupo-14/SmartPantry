@@ -49,11 +49,11 @@ Los requerimientos faltantes y parciales se dividen en **4 bloques verticales au
   - **Acción:** Configurar las nuevas columnas y restricciones en `SmartPantryDbContext.cs`, generar migración `AddProductNutritionalDetails` y verificar su aplicación limpia con `SmartPantry.DbMigrator`.
   - **Criterio de cierre:** Esquema actualizado en SQL Server manteniendo intacto el índice único `IX_AppProducts_Barcode`.
 
-- [ ] **B1-T03 — Persistencia Interna Idempotente desde Catálogo Externo (`RF-08`, `BR-004`)**
+- [x] **B1-T03 — Persistencia Interna Idempotente desde Catálogo Externo (`RF-08`, `BR-004`)**
   - **Acción:** Definir `SaveExternalProductDto` e implementar `ProductAppService.SaveFromExternalAsync` (`POST /api/app/product/save-from-external`): si el `Barcode` no existe en `AppProducts`, crea el `Product`; si ya existe, completa metadatos faltantes y retorna el `ProductDto` existente sin duplicar filas.
   - **Criterio de cierre:** Test de integración obligatorio en `EfCoreProductAppServiceTests.cs` verificando que guardar dos veces el mismo código de barras deja exactamente 1 registro en `AppProducts`.
 
-- [ ] **B1-T04 — Cliente HTTP Search-a-licious (`POST`) y Ampliación v3 (`RF-05`, `RF-06`, `RF-07`)**
+- [x] **B1-T04 — Cliente HTTP Search-a-licious (`POST`) y Ampliación v3 (`RF-05`, `RF-06`, `RF-07`)**
   - **Acción:** Agregar `SearchBaseUrl` (`https://search.openfoodfacts.org/`) en `OpenFoodFactsOptions` y `appsettings.json`. Ampliar `OpenFoodFactsProductCatalogClient.GetByBarcodeAsync` con `image_front_url`, `nutriscore_grade` y `nova_group` (convirtiendo `"unknown"`/`""` en `null`). Implementar `SearchByTextAsync` enviando `POST search` con paginación (`page`, `page_size`, `q`, `fields`) y manejo controlado de `429` y `5xx`/timeout.
   - **Criterio de cierre:** `ExternalProductDto` poblado sin inventar datos ausentes (`BR-002`).
 

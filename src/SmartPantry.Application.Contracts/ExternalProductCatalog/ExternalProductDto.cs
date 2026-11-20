@@ -1,3 +1,5 @@
+using System;
+
 namespace SmartPantry.ExternalProductCatalog;
 
 public class ExternalProductDto
@@ -9,5 +11,10 @@ public class ExternalProductDto
     public string? Quantity { get; set; }
     public string? Ingredients { get; set; }
     public string? Allergens { get; set; }
+    public string? ImageUrl { get; set; }
+    public string? NutriScore { get; set; }
+    public int? NovaGroup { get; set; }
+    public Guid? InternalProductId { get; set; }
+    public DietaryEvaluationDto DietaryEvaluation { get; set; } = new();
 }
 

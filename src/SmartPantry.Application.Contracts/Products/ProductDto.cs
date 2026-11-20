@@ -12,4 +12,8 @@ public class ProductDto : EntityDto<Guid>
     public string? Quantity { get; set; }
     public string? Ingredients { get; set; }
     public string? Allergens { get; set; }
+    public string? ExternalCategories { get; set; }
+    public string? ImageUrl { get; set; }
+    public string? NutriScore { get; set; }
+    public int? NovaGroup { get; set; }
 }

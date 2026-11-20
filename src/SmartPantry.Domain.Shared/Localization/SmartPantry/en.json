@@ -75,6 +75,7 @@
     "Pantry:Validation:QuantityNonNegative": "Quantity must be greater than or equal to 0.",
     "Pantry:Validation:InvalidExpirationDate": "Enter a valid calendar date.",
     "Pantry:Validation:UnitMaxLength": "Unit cannot exceed 32 characters.",
-    "Pantry:SaveError": "Could not save item. Please review the entered data."
+    "Pantry:SaveError": "Could not save item. Please review the entered data.",
+    "SmartPantry:Product:DuplicateBarcode": "A product with this barcode already exists."
   }
 }
