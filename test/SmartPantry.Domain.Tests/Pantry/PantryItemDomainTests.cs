@@ -113,4 +113,90 @@ public class PantryItemDomainTests
         item.SetActive();
         item.State.ShouldBe(PantryItemState.Active);
     }
+
+    [Fact]
+    public void Should_Set_And_Trim_Valid_PrivateNotes()
+    {
+        var item = new PantryItem(
+            Guid.NewGuid(),
+            _userId,
+            _productId,
+            privateNotes: "  Abrir primero  "
+        );
+
+        item.PrivateNotes.ShouldBe("Abrir primero");
+
+        item.SetPrivateNotes("  Comprado en oferta  ");
+
+        item.PrivateNotes.ShouldBe("Comprado en oferta");
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public void Should_Normalize_Null_Empty_Or_Whitespace_PrivateNotes_To_Null(string? notes)
+    {
+        var item = new PantryItem(
+            Guid.NewGuid(),
+            _userId,
+            _productId,
+            privateNotes: "Nota inicial"
+        );
+
+        item.SetPrivateNotes(notes);
+
+        item.PrivateNotes.ShouldBeNull();
+
+        var itemFromConstructor = new PantryItem(
+            Guid.NewGuid(),
+            _userId,
+            _productId,
+            privateNotes: notes
+        );
+
+        itemFromConstructor.PrivateNotes.ShouldBeNull();
+    }
+
+    [Fact]
+    public void Should_Allow_PrivateNotes_With_Exact_Max_Length()
+    {
+        var maxNotes = new string('a', PantryConsts.MaxPrivateNotesLength);
+        var paddedMaxNotes = $"  {maxNotes}  ";
+
+        var item = new PantryItem(
+            Guid.NewGuid(),
+            _userId,
+            _productId,
+            privateNotes: paddedMaxNotes
+        );
+
+        item.PrivateNotes.ShouldBe(maxNotes);
+        item.PrivateNotes!.Length.ShouldBe(PantryConsts.MaxPrivateNotesLength);
+    }
+
+    [Fact]
+    public void Should_Reject_PrivateNotes_Exceeding_Max_Length()
+    {
+        var tooLongNotes = new string('a', PantryConsts.MaxPrivateNotesLength + 1);
+
+        var ctorEx = Should.Throw<BusinessException>(() =>
+        {
+            new PantryItem(
+                Guid.NewGuid(),
+                _userId,
+                _productId,
+                privateNotes: tooLongNotes
+            );
+        });
+
+        ctorEx.Code.ShouldBe("SmartPantry:PantryItem:NotesTooLong");
+
+        var item = new PantryItem(Guid.NewGuid(), _userId, _productId);
+
+        var setterEx = Should.Throw<BusinessException>(() => item.SetPrivateNotes(tooLongNotes));
+
+        setterEx.Code.ShouldBe("SmartPantry:PantryItem:NotesTooLong");
+        item.PrivateNotes.ShouldBeNull();
+    }
 }

@@ -12,6 +12,7 @@ public class PantryItem : AuditedAggregateRoot<Guid>
     public DateTime? ExpirationDate { get; private set; }
     public decimal? Quantity { get; private set; }
     public string? Unit { get; private set; }
+    public string? PrivateNotes { get; private set; }
 
     // Constructor sin parámetros requerido por Entity Framework Core
     protected PantryItem()
@@ -25,7 +26,8 @@ public class PantryItem : AuditedAggregateRoot<Guid>
         DateTime? expirationDate = null,
         PantryItemState state = PantryItemState.Active,
         decimal? quantity = null,
-        string? unit = null) : base(id)
+        string? unit = null,
+        string? privateNotes = null) : base(id)
     {
         UserId = Check.NotNull(userId, nameof(userId));
         if (userId == Guid.Empty)
@@ -43,6 +45,7 @@ public class PantryItem : AuditedAggregateRoot<Guid>
         State = state;
         SetQuantity(quantity);
         SetUnit(unit);
+        SetPrivateNotes(privateNotes);
     }
 
     public void SetExpirationDate(DateTime? expirationDate)
@@ -67,6 +70,16 @@ public class PantryItem : AuditedAggregateRoot<Guid>
             throw new BusinessException("SmartPantry:PantryItem:UnitTooLong", $"La unidad no puede superar los {PantryConsts.MaxUnitLength} caracteres.");
         }
         Unit = string.IsNullOrEmpty(normalized) ? null : normalized;
+    }
+
+    public void SetPrivateNotes(string? notes)
+    {
+        var normalized = notes?.Trim();
+        if (!string.IsNullOrEmpty(normalized) && normalized.Length > PantryConsts.MaxPrivateNotesLength)
+        {
+            throw new BusinessException("SmartPantry:PantryItem:NotesTooLong", $"La nota privada no puede superar los {PantryConsts.MaxPrivateNotesLength} caracteres.");
+        }
+        PrivateNotes = string.IsNullOrEmpty(normalized) ? null : normalized;
     }
 
     public void Consume()
