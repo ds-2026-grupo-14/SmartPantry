@@ -115,7 +115,7 @@ Los requerimientos faltantes y parciales se dividen en **4 bloques verticales au
 **Documentos rectores:** `docs/02_data_models_and_schemas.md` (§3.2, §3.3), `docs/03_business_rules_and_workflows.md` (`BR-003`, `BR-006`, `BR-007`, `BR-009`), `docs/04_api_contracts_and_integrations.md` (§2.4).
 
 ### Backlog Secuencial del Bloque 3
-- [ ] **B3-T01 — Extensión de `PantryItem` con `PrivateNotes` (`RF-14`, `BR-009`)**
+- [x] **B3-T01 — Extensión de `PantryItem` con `PrivateNotes` (`RF-14`, `BR-009`)**
   - **Acción:** Agregar `MaxPrivateNotesLength = 500` en `PantryConsts.cs` y la propiedad `PrivateNotes` con método `SetPrivateNotes(string? notes)` en `PantryItem.cs` (trim automático, blanco -> `null`, excepción `SmartPantry:PantryItem:NotesTooLong` si supera 500 caracteres).
   - **Criterio de cierre:** Pruebas unitarias en `PantryItemDomainTests.cs` validando normalización y límite de 500 caracteres.
 
