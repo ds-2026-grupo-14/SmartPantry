@@ -6,5 +6,6 @@ namespace SmartPantry.ExternalProductCatalog;
 public interface IExternalProductCatalogAppService : IApplicationService
 {
     Task<ExternalProductResultDto> GetByBarcodeAsync(GetExternalProductByBarcodeDto input);
+    Task<ExternalProductSearchResultDto> SearchAsync(SearchExternalProductsDto input);
 }
 

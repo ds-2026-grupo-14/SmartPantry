@@ -57,7 +57,7 @@ Los requerimientos faltantes y parciales se dividen en **4 bloques verticales au
   - **Acción:** Agregar `SearchBaseUrl` (`https://search.openfoodfacts.org/`) en `OpenFoodFactsOptions` y `appsettings.json`. Ampliar `OpenFoodFactsProductCatalogClient.GetByBarcodeAsync` con `image_front_url`, `nutriscore_grade` y `nova_group` (convirtiendo `"unknown"`/`""` en `null`). Implementar `SearchByTextAsync` enviando `POST search` con paginación (`page`, `page_size`, `q`, `fields`) y manejo controlado de `429` y `5xx`/timeout.
   - **Criterio de cierre:** `ExternalProductDto` poblado sin inventar datos ausentes (`BR-002`).
 
-- [ ] **B1-T05 — Endpoint de Búsqueda Paginada y Enriquecimiento de Estado Interno (`RF-06`, `RF-08`)**
+- [x] **B1-T05 — Endpoint de Búsqueda Paginada y Enriquecimiento de Estado Interno (`RF-06`, `RF-08`)**
   - **Acción:** Exponer `GET /api/app/external-product-catalog/search` en `ExternalProductCatalogAppService`, resolviendo `internalProductId` si alguno de los códigos retornados ya se encuentra guardado en `AppProducts` y preparando el campo `DietaryEvaluationDto`.
   - **Criterio de cierre:** Suite en `ExternalProductCatalogAppServiceTests.cs` con mocks `NSubstitute` cubriendo resultados paginados, lista vacía, `RateLimitExceeded` y `ServiceUnavailable` sin depender de Internet.
 
