@@ -80,31 +80,31 @@ Los requerimientos faltantes y parciales se dividen en **4 bloques verticales au
 **Documentos rectores:** `docs/02_data_models_and_schemas.md` (§3.4), `docs/03_business_rules_and_workflows.md` (`BR-001`, `BR-002`, `BR-003`, `BR-010`), `docs/04_api_contracts_and_integrations.md` (§2.3), `docs/05_coding_standards_and_patterns.md` (§4).
 
 ### Backlog Secuencial del Bloque 2
-- [ ] **B2-T01 — Agregado `UserDietaryPreference` y Enumeración `DietaryVerificationStatus` (`RF-03`, `RF-12`)**
+- [x] **B2-T01 — Agregado `UserDietaryPreference` y Enumeración `DietaryVerificationStatus` (`RF-03`, `RF-12`)**
   - **Acción:** Crear `PreferenceConsts` (`MaxWatchedTermsCount = 30`, `MinTermLength = 2`, `MaxTermLength = 64`), `DietaryVerificationStatus` (`Compatible`, `Warning`, `Unverifiable`, `NotConfigured`) en `Domain.Shared`, y el agregado `UserDietaryPreference` en `Domain/Preferences` con normalización en minúsculas sin acentos y deduplicación automática de términos.
   - **Criterio de cierre:** Pruebas unitarias en `UserDietaryPreferenceTests.cs` verificando normalización (`"Maní"` -> `"mani"`), límites de cantidad/longitud e invariante `UserId != Guid.Empty`.
 
-- [ ] **B2-T02 — Servicio de Dominio `DietaryWarningManager` (`RF-12`, `BR-002`)**
+- [x] **B2-T02 — Servicio de Dominio `DietaryWarningManager` (`RF-12`, `BR-002`)**
   - **Acción:** Implementar `DietaryWarningManager` en `Domain/Preferences` aplicando estrictamente `BR-002` (coincidencia positiva -> `Warning`; ausencia de `Ingredients` o `Allergens` con preferencias activas -> `Unverifiable`; ambos presentes sin coincidencia -> `Compatible`; alertas desactivadas o lista vacía -> `NotConfigured`) y método `SyncItemDietaryWarningAsync` para persistir/desactivar `PantryItemWarning` (`WarningType = "DietaryPreference"`).
   - **Criterio de cierre:** Suite unitaria exhaustiva `DietaryWarningManagerTests.cs` cubriendo todos los cuadrantes de completitud de datos y tildes/mayúsculas.
 
-- [ ] **B2-T03 — Persistencia EF Core de `AppUserDietaryPreferences` (`RF-03`)**
+- [x] **B2-T03 — Persistencia EF Core de `AppUserDietaryPreferences` (`RF-03`)**
   - **Acción:** Registrar `DbSet<UserDietaryPreference>` en `SmartPantryDbContext.cs` con índice único `IX_AppUserDietaryPreferences_UserId`, generar migración `AddUserDietaryPreferences` y aplicarla con `DbMigrator`.
   - **Criterio de cierre:** Restricción `1:1` por `UserId` verificada en base de datos.
 
-- [ ] **B2-T04 — `DietaryPreferenceAppService` y Recálculo de Alertas (`RF-03`, `RF-12`, `BR-010`)**
+- [x] **B2-T04 — `DietaryPreferenceAppService` y Recálculo de Alertas (`RF-03`, `RF-12`, `BR-010`)**
   - **Acción:** Implementar `IDietaryPreferenceAppService` y `DietaryPreferenceAppService` (`GET` y `PUT /api/app/dietary-preference/my-preferences`) bajo `[Authorize]` usando `CurrentUser.GetId()`. Al actualizar preferencias, sincronizar de forma idempotente las advertencias `"DietaryPreference"` de los ítems activos del usuario en `AppPantryItemWarnings` y exponer helper de evaluación para catálogo/producto.
   - **Criterio de cierre:** Tests de integración obligatorios (`EfCoreDietaryPreferenceAppServiceTests.cs`) comprobando aislamiento entre usuarios, evaluación `Warning` vs `Unverifiable` e idempotencia en `AppPantryItemWarnings`.
 
-- [ ] **B2-T05 — Verificación y Extensión Opcional de Perfil de Usuario (`RF-02`)**
+- [x] **B2-T05 — Verificación y Extensión Opcional de Perfil de Usuario (`RF-02`)**
   - **Acción:** Verificar localización completa (`es`/`en`) y funcionamiento del flujo nativo `/account/manage-profile` (nombre visible y correo). Implementar endpoint liviano de avatar opcional sobre `Volo.Abp.BlobStoring` (`ProfilePictureContainer` -> `GET/PUT /api/app/profile-picture`) o documentar formalmente en `docs/` la cobertura acordada con el equipo, sin duplicar las pantallas nativas de ABP Account.
   - **Criterio de cierre:** Actualización de perfil comprobada de punta a punta con sesión real.
 
-- [ ] **B2-T06 — Pantalla `PreferencesComponent` (`/preferences`) y Componente `<app-dietary-alert>` (`RF-03`, `RF-12`)**
+- [x] **B2-T06 — Pantalla `PreferencesComponent` (`/preferences`) y Componente `<app-dietary-alert>` (`RF-03`, `RF-12`)**
   - **Acción:** Agregar claves `::Menu:Preferences` y `::Preferences:*` en `es.json`/`en.json`, generar proxies `@proxy/preferences`, registrar ruta `/preferences` con `authGuard` y construir `PreferencesComponent` (alta/baja interactiva de chips de alérgenos/ingredientes vigilados, switch `showAlertsOnScreen`, guardado reactivo y leyenda ética `BR-001`) más componente compartido `<app-dietary-alert>` reutilizable en Catálogo y Despensa.
   - **Criterio de cierre:** Configuración persistida correctamente entre recargas y cambio de idioma español/inglés.
 
-- [ ] **B2-T07 — Pruebas Unitarias Frontend de `PreferencesComponent` en Vitest**
+- [x] **B2-T07 — Pruebas Unitarias Frontend de `PreferencesComponent` en Vitest**
   - **Acción:** Crear `preferences.component.spec.ts` validando estados de carga/error, validación de longitud de términos, prevención de chips duplicados, toggle de alertas y guardado contra proxy simulado.
   - **Criterio de cierre:** `yarn test --watch=false` en verde.
 
