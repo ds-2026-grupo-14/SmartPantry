@@ -1,0 +1,166 @@
+<div class="card preferences">
+  <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
+    <div>
+      <h5 class="card-title mb-1">{{ '::Preferences:Title' | abpLocalization }}</h5>
+      <p class="text-muted small mb-0">{{ '::Preferences:Subtitle' | abpLocalization }}</p>
+    </div>
+
+    <a
+      routerLink="/account/manage-profile"
+      class="btn btn-outline-secondary btn-sm account-profile-link"
+      [title]="'::Preferences:ManageAccountHint' | abpLocalization"
+    >
+      <i class="fa fa-user-cog me-1" aria-hidden="true"></i>
+      {{ '::Preferences:ManageAccountLink' | abpLocalization }}
+    </a>
+  </div>
+
+  <div class="card-body">
+    @switch (viewStatus()) {
+      @case ('loading') {
+        <div class="text-center py-4" role="status" aria-live="polite">
+          <div class="spinner-border spinner-border-sm me-2" aria-hidden="true"></div>
+          <span>{{ '::Preferences:Loading' | abpLocalization }}</span>
+        </div>
+      }
+
+      @case ('error') {
+        <div
+          class="alert alert-danger d-flex flex-wrap align-items-center justify-content-between gap-2"
+          role="alert"
+        >
+          <span>{{ '::Preferences:ErrorLoading' | abpLocalization }}</span>
+          <button type="button" class="btn btn-outline-danger btn-sm" (click)="retry()">
+            <i class="fa fa-redo me-1" aria-hidden="true"></i>{{ '::Preferences:Retry' | abpLocalization }}
+          </button>
+        </div>
+      }
+
+      @default {
+        @if (serverError()) {
+          <div class="alert alert-danger" role="alert">
+            {{ serverError()! | abpLocalization }}
+          </div>
+        }
+
+        @if (saveSuccess()) {
+          <div class="alert alert-success" role="status" aria-live="polite">
+            <i class="fa fa-check-circle me-1" aria-hidden="true"></i>
+            {{ '::Preferences:SaveSuccess' | abpLocalization }}
+          </div>
+        }
+
+        <form (ngSubmit)="addTerm()" class="mb-4" novalidate>
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <label for="watched-term-input" class="form-label fw-semibold mb-0">
+              {{ '::Preferences:TermInputLabel' | abpLocalization }}
+            </label>
+            <span class="badge text-bg-light border">
+              {{ '::Preferences:TermsCountLabel' | abpLocalization }}: {{ watchedTerms().length }} / {{ maxWatchedTerms }}
+            </span>
+          </div>
+
+          <div class="input-group">
+            <input
+              id="watched-term-input"
+              type="text"
+              class="form-control"
+              [formControl]="termControl"
+              [placeholder]="'::Preferences:TermInputPlaceholder' | abpLocalization"
+              [class.is-invalid]="clientValidationError() !== null"
+              autocomplete="off"
+            />
+            <button
+              type="submit"
+              class="btn btn-outline-primary"
+              [disabled]="isSaving()"
+            >
+              <i class="fa fa-plus me-1" aria-hidden="true"></i>
+              {{ '::Preferences:AddTerm' | abpLocalization }}
+            </button>
+          </div>
+
+          @if (clientValidationError()) {
+            <div class="invalid-feedback d-block mt-1" role="alert">
+              {{ clientValidationError()! | abpLocalization }}
+            </div>
+          }
+        </form>
+
+        <section class="mb-4">
+          <h6 class="fw-semibold mb-2">{{ '::Preferences:WatchedTermsTitle' | abpLocalization }}</h6>
+
+          @if (viewStatus() === 'empty') {
+            <div class="alert alert-info mb-0" role="status">
+              {{ '::Preferences:Empty' | abpLocalization }}
+            </div>
+          } @else {
+            <div class="d-flex flex-wrap gap-2 watched-terms-list">
+              @for (term of watchedTerms(); track term) {
+                <span class="badge rounded-pill text-bg-primary d-inline-flex align-items-center gap-2 px-3 py-2 watched-term-chip">
+                  <span>{{ term }}</span>
+                  <button
+                    type="button"
+                    class="btn-close btn-close-white chip-remove-btn"
+                    [disabled]="isSaving()"
+                    [attr.aria-label]="('::Preferences:RemoveTerm' | abpLocalization) + ': ' + term"
+                    (click)="removeTerm(term)"
+                  ></button>
+                </span>
+              }
+            </div>
+          }
+        </section>
+
+        <div class="border rounded p-3 mb-4 bg-body-tertiary">
+          <div class="form-check form-switch mb-1">
+            <input
+              id="show-alerts-switch"
+              type="checkbox"
+              role="switch"
+              class="form-check-input"
+              [checked]="showAlertsOnScreen()"
+              [disabled]="isSaving()"
+              (change)="onToggleAlertsEvent($event)"
+            />
+            <label for="show-alerts-switch" class="form-check-label fw-semibold">
+              {{ '::Preferences:ShowAlertsOnScreen' | abpLocalization }}
+            </label>
+          </div>
+          <p class="text-muted small mb-0">{{ '::Preferences:ShowAlertsHint' | abpLocalization }}</p>
+        </div>
+
+        <div class="d-flex justify-content-end">
+          <button
+            type="button"
+            class="btn btn-primary save-preferences-btn"
+            [disabled]="isSaving()"
+            (click)="save()"
+          >
+            @if (isSaving()) {
+              <span class="spinner-border spinner-border-sm me-1" aria-hidden="true"></span>
+              {{ '::Preferences:Saving' | abpLocalization }}
+            } @else {
+              <i class="fa fa-save me-1" aria-hidden="true"></i>
+              {{ '::Preferences:Save' | abpLocalization }}
+            }
+          </button>
+        </div>
+      }
+    }
+  </div>
+
+  <div class="card-footer bg-warning-subtle border-top border-warning-subtle ethical-disclaimer" role="note">
+    <div class="d-flex align-items-start gap-2 small">
+      <i class="fa fa-info-circle text-warning-emphasis mt-1 flex-shrink-0" aria-hidden="true"></i>
+      <div>
+        <strong class="d-block text-warning-emphasis">
+          {{ '::Preferences:EthicalDisclaimerTitle' | abpLocalization }}
+        </strong>
+        <span class="text-body-secondary">
+          {{ '::Preferences:EthicalDisclaimerText' | abpLocalization }}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>

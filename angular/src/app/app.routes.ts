@@ -28,4 +28,10 @@ export const APP_ROUTES: Routes = [
     loadComponent: () => import('./pantry/pantry.component').then(c => c.PantryComponent),
     canActivate: [authGuard],
   },
+  {
+    path: 'preferences',
+    loadComponent: () =>
+      import('./preferences/preferences.component').then(c => c.PreferencesComponent),
+    canActivate: [authGuard],
+  },
 ];
