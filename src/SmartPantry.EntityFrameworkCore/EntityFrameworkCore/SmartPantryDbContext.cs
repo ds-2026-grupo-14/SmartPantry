@@ -3,6 +3,7 @@ using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using SmartPantry.Authors;
 using SmartPantry.Books;
 using SmartPantry.Pantry;
+using SmartPantry.Preferences;
 using SmartPantry.Products;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.BlobStoring.Database.EntityFrameworkCore;
@@ -40,6 +41,8 @@ public class SmartPantryDbContext :
     public DbSet<PantryItem> PantryItems { get; set; }
 
     public DbSet<PantryItemWarning> PantryItemWarnings { get; set; }
+
+    public DbSet<UserDietaryPreference> UserDietaryPreferences { get; set; }
 
     #region Entities from the modules
 
@@ -151,6 +154,22 @@ public class SmartPantryDbContext :
 
             b.HasIndex(x => new { x.PantryItemId, x.WarningType }).IsUnique();
             b.HasOne<PantryItem>().WithMany().HasForeignKey(x => x.PantryItemId).IsRequired();
+        });
+
+        builder.Entity<UserDietaryPreference>(b =>
+        {
+            b.ToTable(SmartPantryConsts.DbTablePrefix + "UserDietaryPreferences", SmartPantryConsts.DbSchema);
+            b.ConfigureByConvention();
+            b.Property(x => x.UserId).IsRequired();
+            b.Property(x => x.WatchedTerms).IsRequired().HasMaxLength(PreferenceConsts.MaxSerializedWatchedTermsLength);
+            b.Property(x => x.ShowAlertsOnScreen).IsRequired().HasDefaultValue(true);
+
+            b.HasIndex(x => x.UserId).IsUnique().HasDatabaseName("IX_AppUserDietaryPreferences_UserId");
+            b.HasOne<IdentityUser>()
+                .WithOne()
+                .HasForeignKey<UserDietaryPreference>(x => x.UserId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }
