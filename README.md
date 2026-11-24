@@ -2,7 +2,7 @@
 # SmartPantry
 
 ## Integrantes
-- Carricarte Lautaro - lautarocarricarte46317802-star
+- Carricarte Lautaro - lautarocarricart3
 - Susco Santiago - SantiagoSusco
 - Telli Benjamin - BenjaTelli
 - Treppo Juan Ignacio - JuanIgnacioTreppo
