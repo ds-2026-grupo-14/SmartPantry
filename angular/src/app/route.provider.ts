@@ -24,5 +24,12 @@ function configureRoutes() {
       order: 2,
       layout: eLayoutType.application,
     },
+    {
+      path: '/preferences',
+      name: '::Menu:Preferences',
+      iconClass: 'fas fa-sliders-h',
+      order: 3,
+      layout: eLayoutType.application,
+    },
   ]);
 }

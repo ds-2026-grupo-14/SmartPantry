@@ -62,7 +62,7 @@ Esta matriz refleja el estado real auditado en el repositorio tras el cierre del
 | ID | Requerimiento Funcional | Historia Asociada | Estado Actual en Repositorio | Trabajo Técnico Definido en esta Suite |
 |---|---|---|---|---|
 | **RF-01** | Autenticación de sesión | Transversal | **Completo** | Mantenido sobre OpenIddict + `[Authorize]` + `authGuard`. |
-| **RF-02** | Perfil de usuario | Transversal | **Parcial (Base ABP)** | Nombre, apellido y correo cubiertos por `/account/manage-profile`; soporte opcional de avatar vía `BlobStoring` documentado. |
+| **RF-02** | Perfil de usuario | Transversal | **Completo (ABP Account + Enlace `/preferences`)** | Cubierto íntegramente por el flujo nativo `/account/manage-profile` (`GET/PUT /api/account/my-profile`: nombre visible, apellido, usuario, correo y contraseña), verificado con pruebas de integración y enlazado desde la cabecera de `/preferences` sin duplicar pantallas nativas de ABP. Foto/avatar opcional sobre `Volo.Abp.BlobStoring` acordada fuera del núcleo mínimo obligatorio. |
 | **RF-03** | Preferencias alimentarias | HU-01 | **Pendiente** | Entidad `UserDietaryPreference`, `DietaryPreferenceAppService` y pantalla `/preferences` en Angular. |
 | **RF-04** | Administración de usuarios | Transversal | **Completo** | Cubierto nativamente por `@abp/ng.identity` y `Volo.Abp.Identity`. |
 | **RF-05** | Búsqueda externa por código | HU-02 | **Parcial (Solo Backend)** | Backend operativo (`GetByBarcodeAsync`); se especifica vista `/catalog` en Angular conectada al proxy. |

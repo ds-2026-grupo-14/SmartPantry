@@ -1,0 +1,99 @@
+@switch (status()) {
+  @case (DietaryVerificationStatus.Warning) {
+    @if (compact()) {
+      <span class="badge bg-warning text-dark dietary-alert-badge" role="status">
+        <i class="fa fa-exclamation-triangle me-1" aria-hidden="true"></i>
+        {{ '::DietaryAlert:WarningTitle' | abpLocalization }}
+        @if (matchedTerms().length > 0) {
+          <span class="ms-1 fw-normal">({{ matchedTerms().join(', ') }})</span>
+        }
+      </span>
+    } @else {
+      <div class="alert alert-warning dietary-alert-banner mb-0" role="alert">
+        <div class="d-flex align-items-start gap-2">
+          <i class="fa fa-exclamation-triangle mt-1 flex-shrink-0" aria-hidden="true"></i>
+          <div class="flex-grow-1">
+            <div class="fw-semibold">{{ '::DietaryAlert:WarningTitle' | abpLocalization }}</div>
+            <p class="mb-2 small">
+              @if (informationalMessage()) {
+                {{ informationalMessage() }}
+              } @else {
+                {{ '::DietaryAlert:WarningMessage' | abpLocalization }}
+              }
+            </p>
+            @if (matchedTerms().length > 0) {
+              <div class="d-flex flex-wrap gap-1 mb-2">
+                @for (term of matchedTerms(); track term) {
+                  <span class="badge rounded-pill text-bg-dark dietary-matched-term">{{ term }}</span>
+                }
+              </div>
+            }
+            <div class="small text-muted dietary-source-note">
+              {{ '::DietaryAlert:SourceAttribution' | abpLocalization }}
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  }
+
+  @case (DietaryVerificationStatus.Unverifiable) {
+    @if (compact()) {
+      <span class="badge bg-secondary dietary-alert-badge" role="status">
+        <i class="fa fa-question-circle me-1" aria-hidden="true"></i>
+        {{ '::DietaryAlert:UnverifiableTitle' | abpLocalization }}
+      </span>
+    } @else {
+      <div class="alert alert-secondary border border-warning dietary-alert-banner mb-0" role="alert">
+        <div class="d-flex align-items-start gap-2">
+          <i class="fa fa-question-circle mt-1 flex-shrink-0" aria-hidden="true"></i>
+          <div class="flex-grow-1">
+            <div class="fw-semibold">{{ '::DietaryAlert:UnverifiableTitle' | abpLocalization }}</div>
+            <p class="mb-2 small">
+              @if (informationalMessage()) {
+                {{ informationalMessage() }}
+              } @else {
+                {{ '::DietaryAlert:UnverifiableMessage' | abpLocalization }}
+              }
+            </p>
+            <div class="small text-muted dietary-source-note">
+              {{ '::DietaryAlert:SourceAttribution' | abpLocalization }}
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  }
+
+  @case (DietaryVerificationStatus.Compatible) {
+    @if (compact()) {
+      <span class="badge bg-success dietary-alert-badge" role="status">
+        <i class="fa fa-check-circle me-1" aria-hidden="true"></i>
+        {{ '::DietaryAlert:CompatibleTitle' | abpLocalization }}
+      </span>
+    } @else {
+      <div class="alert alert-success dietary-alert-banner mb-0" role="status">
+        <div class="d-flex align-items-start gap-2">
+          <i class="fa fa-check-circle mt-1 flex-shrink-0" aria-hidden="true"></i>
+          <div class="flex-grow-1">
+            <div class="fw-semibold">{{ '::DietaryAlert:CompatibleTitle' | abpLocalization }}</div>
+            <p class="mb-2 small">
+              @if (informationalMessage()) {
+                {{ informationalMessage() }}
+              } @else {
+                {{ '::DietaryAlert:CompatibleMessage' | abpLocalization }}
+              }
+            </p>
+            <div class="small text-muted dietary-source-note">
+              {{ '::DietaryAlert:SourceAttribution' | abpLocalization }}
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  }
+
+  @case (DietaryVerificationStatus.NotConfigured) {
+    <!-- Sin alerta cuando no hay preferencias configuradas o alertas desactivadas -->
+  }
+}
